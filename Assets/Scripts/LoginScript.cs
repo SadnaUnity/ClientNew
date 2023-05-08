@@ -42,8 +42,6 @@ public class LoginScript : MonoBehaviour
 
         if(res.Item1 == 200)
         {
-            PlayerPrefs.SetString("PlayerUserName", usernameData);
-            //PlayerDTO playerDTO = JsonUtility.FromJson<PlayerDTO>(res.Item2);
             PlayerDTO playerDto = JsonConvert.DeserializeObject<PlayerDTO>(res.Item2);
             PlayerDataManager.PlayerData = new Player(playerDto);
             Debug.Log("Login success");
