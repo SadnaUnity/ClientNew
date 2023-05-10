@@ -20,32 +20,51 @@ public class MovingScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        rsc = "/updatePosition";
-        speed = 1000f;
-        httpReq = new HttpRequest();
-        playerData = PlayerDataManager.PlayerData;
-        playerId = playerData.GetId();
-        curPlayer = new GameObject(playerData.GetId().ToString());
-        playersById = new Dictionary<int, GameObject>()
-        {
-            {playerId, curPlayer}
-        };
-
-        // Add a SpriteRenderer component to the new GameObject
-        SpriteRenderer spriteRenderer = curPlayer.AddComponent<SpriteRenderer>();
-        
-        // Assign the sprite to the SpriteRenderer component and load img
-        spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(playerData.GetAvatar()));
-
-        spriteRenderer.transform.localScale = new Vector3(8f, 8f, 4f);
-
-        curPlayer.transform.position = new Vector3(0, 0, 0);  
-        mousePosition = curPlayer.transform.position;
-
-        SendPosition(curPlayer.transform.position);
-        // Start coroutine to get other players' positions every second
-        StartCoroutine(GetOtherPlayersPositions());
-    }
+             // Create a background game object
+             GameObject background = new GameObject("Background");
+     
+             // Attach a Sprite Renderer component to the background game object
+             SpriteRenderer backroundspriteRenderer = background.AddComponent<SpriteRenderer>();
+     
+             // Set the background image as the sprite for the Sprite Renderer
+             backroundspriteRenderer.sprite = Resources.Load<Sprite>("Images/backrounnds/1193"); 
+     
+             // Set the sorting layer of the background object to a lower value
+             backroundspriteRenderer.sortingLayerName = "Background";
+             backroundspriteRenderer.sortingOrder = -1;
+     
+             // Position the background object and set its scale
+             background.transform.position = new Vector3(0f, 0f, 0f); 
+             background.transform.localScale = new Vector3(85f, 85f, 85f);
+             
+             rsc = "/updatePosition";
+             speed = 1000f;
+             httpReq = new HttpRequest();
+             playerData = PlayerDataManager.PlayerData;
+             playerId = playerData.GetId();
+             curPlayer = new GameObject(playerData.GetId().ToString());
+             playersById = new Dictionary<int, GameObject>()
+             {
+                 {playerId, curPlayer}
+             };
+     
+             // Add a SpriteRenderer component to the new GameObject
+             SpriteRenderer spriteRenderer = curPlayer.AddComponent<SpriteRenderer>();
+             
+             // Assign the sprite to the SpriteRenderer component and load img
+             spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(playerData.GetAvatar()));
+     
+             spriteRenderer.transform.localScale = new Vector3(8f, 8f, 4f);
+     
+             curPlayer.transform.position = new Vector3(0, 0, 0);  
+             spriteRenderer.sortingOrder = 1;
+     
+             mousePosition = curPlayer.transform.position;
+     
+             SendPosition(curPlayer.transform.position);
+             // Start coroutine to get other players' positions every second
+             StartCoroutine(GetOtherPlayersPositions());
+     }
 
     // Update is called once per frame
     void Update()
