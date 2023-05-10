@@ -1,20 +1,19 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using Classes.DTO;
 using UnityEngine;
 
 [Serializable]
 public class PosDataDTO
 {
-    public PlayerDTO playerDto{ set; get; }
-    public PositionDTO positionDto{ set; get; }
+    public string message { set; get; }
+    public List<AvatarPositionDTO> avatarPositions { set; get; }
 
     public PosDataDTO()
     {
     }
 
-    public PosDataDTO(PlayerDTO playerDto, PositionDTO positionDto)
-    {
-        this.playerDto = playerDto;
-        this.positionDto = positionDto;
-    }
+   
+    
 }

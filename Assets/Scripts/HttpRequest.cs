@@ -14,7 +14,8 @@ public class HttpRequest {
 
     public HttpRequest()
     {
-        baseURL = "http://localhost:8080";
+        //baseURL = "http://localhost:8080";
+        baseURL = "https://school-384409.oa.r.appspot.com";
     }
     public Tuple<long, string> SendDataToServer(string posterName, int roomId, int userId, string fileName, byte[] fileData, string rsc) {
         using (var client = new HttpClient())

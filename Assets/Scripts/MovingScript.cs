@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Classes.DTO;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -65,37 +67,38 @@ public class MovingScript : MonoBehaviour
 
     private void SendPosition(Vector3 pos)
     {
-        PosDataDTO posDataDto = new PosDataDTO(new PlayerDTO(playerData), new PositionDTO(playerId, pos.x, pos.y));
-        string jsonPos = JsonConvert.SerializeObject(posDataDto);
+        string jsonPos = JsonConvert.SerializeObject(new PositionDTO(playerId, pos.x, pos.y));
         var res = httpReq.SendDataToServer(null, jsonPos, rsc, "POST");
-        
     }
     IEnumerator GetOtherPlayersPositions()
     {
         while (true)
         {
-            var res = httpReq.SendDataToServer(null, "", "/getPositions", "GET");
+            List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+            {
+                new("userId", playerId)
+            };
+            var res = httpReq.SendDataToServer(queryParams, "", "/getPositions", "GET");
             if (res.Item1 == 200)
             {
                 // Parse the JSON response into a list of players
-                var playersPositions = JsonConvert.DeserializeObject<Dictionary<string, PosDataDTO>>(res.Item2);
-
+                PosDataDTO playersPositions = JsonConvert.DeserializeObject<PosDataDTO>(res.Item2);
+                List<Tuple<Avatar, Position>> avatarPositions = GetAllAvatarsPostions(playersPositions);
                 // Update the positions of all other players in the game scene
-                foreach (string idStr in playersPositions.Keys)
+                foreach (Tuple<Avatar, Position> avatarPosition in avatarPositions)
                 {
-                    int id = int.Parse(idStr);
+                    int id = avatarPosition.Item1.GetId();
                     if (id != playerId)
                     {
                         //If not on screen yet
                         if (!playersById.ContainsKey(id))
                         {
-                            playersById.Add(id, CreateGameObject(playersPositions[idStr]));
+                            playersById.Add(id, CreateGameObject(avatarPosition));
                         }
                         //Already on screen - move him slowly towards target
                         else
                         {
-                            Position positionData = new Position(playersPositions[idStr].positionDto);
-                            Vector3 targetPosition = new Vector3(positionData.GetX(), positionData.GetY(), 0f);
+                            Vector3 targetPosition = new Vector3(avatarPosition.Item2.GetX(), avatarPosition.Item2.GetY(),0f);
                             while (playersById[id].transform.position != targetPosition)
                             {
                                 playersById[id].transform.position = Vector3.MoveTowards(playersById[id].transform.position, targetPosition, speed * Time.deltaTime);
@@ -115,21 +118,31 @@ public class MovingScript : MonoBehaviour
         }
     }
 
-
-    private GameObject CreateGameObject(PosDataDTO posDataDto)
+    private List<Tuple<Avatar, Position>> GetAllAvatarsPostions(PosDataDTO playersPositions)
     {
-        GameObject character = new GameObject(posDataDto.playerDto.userId.ToString());
+        List<Tuple<Avatar, Position>> res = new List<Tuple<Avatar, Position>>();
+        List<AvatarPositionDTO> avatarPositions = playersPositions.avatarPositions;
+
+        foreach (AvatarPositionDTO avatarPosition in avatarPositions)
+        {
+            res.Add(new Tuple<Avatar, Position>(new Avatar(avatarPosition.avatar), new Position(avatarPosition.position)));
+        }
+
+        return res;
+    }
+    private GameObject CreateGameObject(Tuple<Avatar, Position> avatarPosition)
+    {
+        GameObject character = new GameObject(avatarPosition.Item1.GetId().ToString());
 
         // Add a SpriteRenderer component to the new GameObject
         SpriteRenderer spriteRenderer = character.AddComponent<SpriteRenderer>();
         
         // Assign the sprite to the SpriteRenderer component and load img
-        spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(new Avatar(posDataDto.playerDto.avatar)));
+        spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(avatarPosition.Item1));
 
         spriteRenderer.transform.localScale = new Vector3(8f, 8f, 4f);
         
-        PositionDTO positionDto = posDataDto.positionDto;
-        character.transform.position = new Vector3(positionDto.x, positionDto.y);
+        character.transform.position = new Vector3(avatarPosition.Item2.GetX(), avatarPosition.Item2.GetY());
         
         return character;
     }

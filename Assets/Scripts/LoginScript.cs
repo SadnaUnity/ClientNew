@@ -36,7 +36,6 @@ public class LoginScript : MonoBehaviour
             new("username", usernameData),
             new("password", passwordData)
         };
-        
 
         var res = httpReq.SendDataToServer(queryParams, "", rsc, "POST");
 
