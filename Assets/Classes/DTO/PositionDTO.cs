@@ -7,7 +7,6 @@ public class PositionDTO
     public int id{ set; get; }
     public float x{ set; get; }
     public float y{ set; get; }
-
     public PositionDTO()
     {
     }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -16,6 +17,10 @@ public class RegisterScript : MonoBehaviour
     public Image avatar;
     public AvatarAccessory accessory;
     public AvatarColor color;
+    void Start()
+    {
+        AvatarImage();        
+    }
 
     public void ClickedBtn()
     {
@@ -52,7 +57,9 @@ public class RegisterScript : MonoBehaviour
 
         if (res.Item1 == 200)
         {
-            PlayerPrefs.SetString("username", usernameTF.text);
+            PlayerDTO playerDto = JsonConvert.DeserializeObject<PlayerDTO>(res.Item2);
+            PlayerDataManager.PlayerData = new Player(playerDto);
+            Debug.Log("Register success");
             SceneManager.LoadScene("Moving");
         }
         else
@@ -68,11 +75,7 @@ public class RegisterScript : MonoBehaviour
         passwordTF.text = "";
         confirmPasswordTF.text = "";
     }
-    void Start()
-    {
-        AvatarImage();        
-    }
-
+    
 
     private void AvatarImage()
     {

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 
 public class HttpRequest {
@@ -12,90 +14,34 @@ public class HttpRequest {
 
     public HttpRequest()
     {
-        baseURL = "http://localhost:8080";
+        //baseURL = "http://localhost:8080";
+        baseURL = "https://school-384409.oa.r.appspot.com";
     }
-    /*public Tuple<long, string> SendDataToServer(List<KeyValuePair<string, object>> queryParameters, string body, string rsc, string method)
-    {
-        string msg;
-        string url;
-
-        url = baseURL + rsc;
-
-        url = AddQueryParams(queryParameters, url);
-
-        // Create UnityWebRequest object
-        UnityWebRequest request = new UnityWebRequest(url, method);
-
-        // Set request headers
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        // Convert JSON data to byte array
-        byte[] jsonBytes = System.Text.Encoding.UTF8.GetBytes(body);
-
-        // Set request body
-        request.uploadHandler = new UploadHandlerRaw(jsonBytes);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.uploadHandler.contentType = "application/json";
-        
-        // Send request
-        UnityWebRequestAsyncOperation operation = request.SendWebRequest();
-
-        while (!operation.isDone)
+    public Tuple<long, string> SendDataToServer(string posterName, int roomId, int userId, string fileName, byte[] fileData, string rsc) {
+        using (var client = new HttpClient())
+        using (var content = new MultipartFormDataContent())
         {
-            // You can do any additional processing here
-        }
+            // Add the posterName, roomId, and userId parameters as form data
+            content.Add(new StringContent(posterName), "posterName");
+            content.Add(new StringContent(roomId.ToString()), "roomId");
+            content.Add(new StringContent(userId.ToString()), "userId");
 
-        // Handle response
-        if (request.result != UnityWebRequest.Result.Success)
-        {
-            msg = "Error: " + request.error;
+            // Add the file as form data
+            var fileContent = new ByteArrayContent(fileData);
+            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+            content.Add(fileContent, "file", fileName);
+
+            // Send the request
+            var response = client.PostAsync(baseURL + rsc , content).Result;
+
+            // Read the response body
+            var responseBody = response.Content.ReadAsStringAsync().Result;
+
+            // Return the response status code and body as a Tuple
+            return Tuple.Create((long)response.StatusCode, responseBody);
         }
-        else
-        {
-            msg = request.downloadHandler.text;
-        }
-        
-        //kill them because the make memory
-        request.disposeUploadHandlerOnDispose = true;
-        request.disposeDownloadHandlerOnDispose = true;
-        
-        return new Tuple<long, string>(request.responseCode, msg);
     }
-    private string AddQueryParams(List<KeyValuePair<string, object>> queryParameters, string url)
-    {
-        if (queryParameters != null)
-        {
-            StringBuilder stringBuilder = new StringBuilder(url);
-            if (!url.Contains("?")) {
-                stringBuilder.Append("?");
-            } else if (!url.EndsWith("&")) {
-                stringBuilder.Append("&");
-            }
 
-            foreach (var pair in queryParameters) {
-                if (pair.Value is int) {
-                    stringBuilder.AppendFormat("{0}={1}&", Uri.EscapeDataString(pair.Key), Uri.EscapeDataString(pair.Value.ToString()));
-                } else if (pair.Value is string) {
-                    stringBuilder.AppendFormat("{0}={1}&", Uri.EscapeDataString(pair.Key), Uri.EscapeDataString(pair.Value.ToString()));
-                } else {
-                    //Debug.Log("Invalid value type: {0}", pair.Value.GetType().Name);
-                }
-            }
-
-            if (stringBuilder.Length > 0)
-            {
-                stringBuilder.Length--;
-            }
-
-            return stringBuilder.ToString();
-        }
-        else
-        {
-            return url;
-        }
-        
-    }
-*/
     public Tuple<long, string> SendDataToServer(List<KeyValuePair<string, object>> queryParameters, string body, string rsc, string method)
     {
         // Create the URL string with query parameters if there are any
@@ -152,6 +98,8 @@ public class HttpRequest {
         // Return the response status code and content as a Tuple
         return new Tuple<long, string>((long)response.StatusCode, responseContent);
     }
+    
+    
 }
 
 

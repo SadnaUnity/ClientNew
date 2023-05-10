@@ -6,7 +6,7 @@ public class AvatarDTO
 {
     public string accessory { set; get; }
     public string color{ set; get; }
-
+    public int avatarId{ set; get; }
     public AvatarDTO()
     {
     }
@@ -15,5 +15,6 @@ public class AvatarDTO
     {
         accessory = avatar.GetAccessory().ToString();
         color = avatar.GetColor().ToString();
+        avatarId = avatar.GetId();
     }
 }

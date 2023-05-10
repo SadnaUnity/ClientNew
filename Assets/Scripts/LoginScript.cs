@@ -36,14 +36,11 @@ public class LoginScript : MonoBehaviour
             new("username", usernameData),
             new("password", passwordData)
         };
-        
 
         var res = httpReq.SendDataToServer(queryParams, "", rsc, "POST");
 
         if(res.Item1 == 200)
         {
-            PlayerPrefs.SetString("PlayerUserName", usernameData);
-            //PlayerDTO playerDTO = JsonUtility.FromJson<PlayerDTO>(res.Item2);
             PlayerDTO playerDto = JsonConvert.DeserializeObject<PlayerDTO>(res.Item2);
             PlayerDataManager.PlayerData = new Player(playerDto);
             Debug.Log("Login success");

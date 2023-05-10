@@ -18,11 +18,13 @@ public class Avatar
 {
     private AvatarAccessory accessory;
     private AvatarColor color;
+    private int avatarId;
 
     public Avatar(AvatarDTO avatarDTO)
     {
         accessory = (AvatarAccessory)Enum.Parse(typeof(AvatarAccessory), avatarDTO.accessory);
         color = (AvatarColor)Enum.Parse(typeof(AvatarColor), avatarDTO.color);
+        avatarId = avatarDTO.avatarId;
     }
     public AvatarAccessory GetAccessory()
     {
@@ -34,6 +36,10 @@ public class Avatar
         return color;
     }
 
+    public int GetId()
+    {
+        return avatarId;
+    }
     public void SetAccessory(AvatarAccessory accessory)
     {
         this.accessory = accessory;
@@ -42,5 +48,10 @@ public class Avatar
     public void SetColor(AvatarColor color)
     {
         this.color = color;
+    }
+
+    public void SetId(int id)
+    {
+        this.avatarId = id;
     }
 }
