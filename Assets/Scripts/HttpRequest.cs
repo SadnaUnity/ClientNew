@@ -60,6 +60,9 @@ public class HttpRequest {
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
         request.Method = method;
         request.ContentType = "application/json";
+        byte[] bodyBytes = Encoding.UTF8.GetBytes(body);
+        int bodyLength = bodyBytes.Length;
+        request.ContentLength = bodyLength;
         
         // Add the body content to the request if there is any
         if (!string.IsNullOrEmpty(body))
