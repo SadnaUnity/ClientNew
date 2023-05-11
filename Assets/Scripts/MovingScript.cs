@@ -26,6 +26,7 @@ public class MovingScript : MonoBehaviour
         playerData = PlayerDataManager.PlayerData;
         playerId = playerData.GetId();
         curPlayer = new GameObject(playerData.GetId().ToString());
+
         playersById = new Dictionary<int, GameObject>()
         {
             {playerId, curPlayer}
@@ -63,6 +64,13 @@ public class MovingScript : MonoBehaviour
        
         // Move the player towards the mouse position
         curPlayer.transform.position = Vector3.MoveTowards(curPlayer.transform.position, mousePosition, speed * Time.deltaTime);
+    }
+    
+    void LateUpdate()
+    {
+        // Update the camera's position to follow the curPlayerTransform
+        Vector3 newPosition = new Vector3(curPlayer.transform.position.x, curPlayer.transform.position.y, transform.position.z);
+        transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * speed);
     }
 
     private void SendPosition(Vector3 pos)
@@ -114,7 +122,7 @@ public class MovingScript : MonoBehaviour
             }
 
             // Wait for one second before sending another GET request
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.2f);
         }
     }
 

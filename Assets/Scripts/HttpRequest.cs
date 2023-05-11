@@ -14,8 +14,8 @@ public class HttpRequest {
 
     public HttpRequest()
     {
-        //baseURL = "http://localhost:8080";
-        baseURL = "https://school-384409.oa.r.appspot.com";
+        baseURL = "http://localhost:8080";
+        //baseURL = "https://school-384409.oa.r.appspot.com";
     }
     public Tuple<long, string> SendDataToServer(string posterName, int roomId, int userId, string fileName, byte[] fileData, string rsc) {
         using (var client = new HttpClient())
@@ -60,6 +60,9 @@ public class HttpRequest {
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
         request.Method = method;
         request.ContentType = "application/json";
+        byte[] bodyBytes = Encoding.UTF8.GetBytes(body);
+        int bodyLength = bodyBytes.Length;
+        request.ContentLength = bodyLength;
         
         // Add the body content to the request if there is any
         if (!string.IsNullOrEmpty(body))
