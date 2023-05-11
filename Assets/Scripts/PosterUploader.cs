@@ -3,47 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.EventSystems;
+using Button = UnityEngine.UIElements.Button;
 
 public class PosterUploader : MonoBehaviour
 {
     [SerializeField] private Canvas canvas;
+    [SerializeField] private GameObject panel;
+    [SerializeField] private TMP_InputField posterNameIF;
     private HttpRequest httpRequest;
     private GameObject poster;
-    private ImagePositionHandler positionHandler;
+    private ImagePositionHandler imgPositionHandler;
+    private byte[] posterImgFile;
+    private Player playerData;
+    
     public void Start()
     {
+        panel.SetActive(false);
         httpRequest = new HttpRequest();
         poster = new GameObject("poster");
         poster.transform.SetParent(canvas.transform);
+        playerData = PlayerDataManager.PlayerData;
     }
     public void UploadPoster()
-    {
-        var imgFile = ChooseImg();
-        if (imgFile != null) 
-        {
-            //var res = SendImg(imgFile);
-        }
-    }
-
-    public void ChoosePosterPosition()
-    {
-        // Add a UI button to the scene that will call this method when clicked
-        // In the inspector, drag and drop the "poster" game object onto the "Poster" field
-
-        // Get the position handler script on the poster game object
-        positionHandler = poster.AddComponent<ImagePositionHandler>();
-
-        // Enable the position handler script
-        positionHandler.enabled = true;
-    }
-    public void ToggleDrag()
-    {
-        positionHandler.enabled = false;
-    }
-
-    private byte[] ChooseImg()
     {
         // Show file dialog to choose an image file
         string[] extensions = { "jpg", "jpg", "png", "png" };
@@ -62,21 +47,38 @@ public class PosterUploader : MonoBehaviour
                 Image img = poster.AddComponent<Image>();
                 img.sprite = sprite;
                 poster.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
-                return bytes;
+                posterImgFile = bytes;
             }
         }
-        return null;
     }
-    private Tuple<long, string> SendImg(byte[] imgFile)
+
+    public void ChoosePosterPosition()
     {
+        // Get the position handler script on the poster game object
+        imgPositionHandler = poster.AddComponent<ImagePositionHandler>();
+
+        // Enable the position handler script
+        imgPositionHandler.enabled = true;
+    }
+    public void LockPosterPosition()
+    {
+        imgPositionHandler.enabled = false;
+        panel.SetActive(true);
+    }
+
+    public void SendPoster()
+    {
+        panel.SetActive(false);
+        Vector3 posterPos = poster.transform.position;
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
-            new("userId", 1),
+            new("userId", playerData.GetUserId()),
             new("roomId", 1),
-            new("posterName", "ere")
+            new("posterName", posterNameIF.text),
+            new("xPos", posterPos.x),
+            new("yPos", posterPos.y)
         };
-        return httpRequest.SendDataToServer("posterrrname", 1, 1, "file", imgFile, "/poster");
-
+        var res = httpRequest.SendDataToServer(queryParams, "file", posterImgFile, "/poster");
     }
 
     private Texture2D LoadTextureFromFile(string filePath)

@@ -24,8 +24,8 @@ public class MovingScript : MonoBehaviour
         speed = 1000f;
         httpReq = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
-        playerId = playerData.GetId();
-        curPlayer = new GameObject(playerData.GetId().ToString());
+        playerId = playerData.GetUserId();
+        curPlayer = new GameObject(playerData.GetUserId().ToString());
 
         playersById = new Dictionary<int, GameObject>()
         {
@@ -75,8 +75,12 @@ public class MovingScript : MonoBehaviour
 
     private void SendPosition(Vector3 pos)
     {
-        string jsonPos = JsonConvert.SerializeObject(new PositionDTO(playerId, pos.x, pos.y));
-        var res = httpReq.SendDataToServer(null, jsonPos, rsc, "POST");
+        string jsonPos = JsonConvert.SerializeObject(new PositionDTO(pos.x, pos.y));
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerId)
+        };
+        var res = httpReq.SendDataToServer(queryParams, jsonPos, rsc, "POST");
     }
     IEnumerator GetOtherPlayersPositions()
     {
@@ -122,7 +126,7 @@ public class MovingScript : MonoBehaviour
             }
 
             // Wait for one second before sending another GET request
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.4f);
         }
     }
 

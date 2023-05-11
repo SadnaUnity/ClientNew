@@ -2,30 +2,40 @@
 
 public class Player
 {
-    private int id;
+    private int userId;
+    private int roomId;
     private string username;
     private Avatar avatar;
 
     public Player(){}
     public Player(PlayerDTO playerDTO)
     {
-        id = playerDTO.userId;
+        roomId = 1;
+        userId = playerDTO.userId;
         username = playerDTO.username;
         avatar = new Avatar(playerDTO.avatar);
     }
-    public int GetId()
+    public int GetUserId()
     {
-        return id;
+        return userId;
     }
 
+    public int GetRoomId()
+    {
+        return roomId;
+    }
     public Avatar GetAvatar()
     {
         return avatar;
     }
 
-    public void SetId(int id)
+    public void SetUserId(int id)
     {
-        this.id = id;
+        this.userId = id;
+    }
+    public void SetRoomId(int id)
+    {
+        this.roomId = id;
     }
 
     public void SetAvatar(Avatar avatar)
