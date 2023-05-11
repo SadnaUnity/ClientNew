@@ -11,7 +11,7 @@ public class PosterUploader : MonoBehaviour
     [SerializeField] private Canvas canvas;
     private HttpRequest httpRequest;
     private GameObject poster;
-    
+    private ImagePositionHandler positionHandler;
     public void Start()
     {
         httpRequest = new HttpRequest();
@@ -33,10 +33,14 @@ public class PosterUploader : MonoBehaviour
         // In the inspector, drag and drop the "poster" game object onto the "Poster" field
 
         // Get the position handler script on the poster game object
-        ImagePositionHandler positionHandler = poster.AddComponent<ImagePositionHandler>();
+        positionHandler = poster.AddComponent<ImagePositionHandler>();
 
         // Enable the position handler script
         positionHandler.enabled = true;
+    }
+    public void ToggleDrag()
+    {
+        positionHandler.enabled = false;
     }
 
     private byte[] ChooseImg()
@@ -95,4 +99,5 @@ public class ImagePositionHandler : MonoBehaviour, IDragHandler
     {
         transform.position = Input.mousePosition;
     }
+   
 }
