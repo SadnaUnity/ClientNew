@@ -5,6 +5,8 @@ using Classes.DTO;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class MovingScript : MonoBehaviour
 {
@@ -16,13 +18,17 @@ public class MovingScript : MonoBehaviour
     private int playerId;
     private GameObject curPlayer;
     private Dictionary<int, GameObject> playersById;
+    [SerializeField] private Canvas canvas;
+    [SerializeField] private GameObject background;
+    private HttpRequest httpRequest;
+    private Vector3[] doorPositions; 
     
     // Start is called before the first frame update
     void Start()
     {
-        // Create a background game object
-        GameObject background = new GameObject("Background");
-
+        httpRequest = new HttpRequest();
+        // Create a background game objectGameObject background = new GameObject("Background");
+        background.transform.SetParent(canvas.transform);
         // Attach a Sprite Renderer component to the background game object
         SpriteRenderer backroundspriteRenderer = background.AddComponent<SpriteRenderer>();
 
@@ -33,9 +39,6 @@ public class MovingScript : MonoBehaviour
         backroundspriteRenderer.sortingLayerName = "Background";
         backroundspriteRenderer.sortingOrder = -1;
 
-        // Position the background object and set its scale
-        background.transform.position = new Vector3(0f, 0f, 0f); 
-        background.transform.localScale = new Vector3(85f, 85f, 85f);
         
         rsc = "/updatePosition";
         speed = 1000f;
@@ -54,9 +57,9 @@ public class MovingScript : MonoBehaviour
         // Assign the sprite to the SpriteRenderer component and load img
         spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(playerData.GetAvatar()));
 
-        spriteRenderer.transform.localScale = new Vector3(8f, 8f, 4f);
+        spriteRenderer.transform.localScale = new Vector3(3f, 3f, 3f);
 
-        curPlayer.transform.position = new Vector3(0, 0, 0);  
+        curPlayer.transform.position = new Vector3(445, 90, 0);  
         spriteRenderer.sortingOrder = 1;
 
         mousePosition = curPlayer.transform.position;
@@ -64,6 +67,7 @@ public class MovingScript : MonoBehaviour
         SendPosition(curPlayer.transform.position);
         // Start coroutine to get other players' positions every second
         StartCoroutine(GetOtherPlayersPositions());
+        getDoors();
     }
 
     // Update is called once per frame
@@ -82,8 +86,73 @@ public class MovingScript : MonoBehaviour
        
         // Move the player towards the mouse position
         curPlayer.transform.position = Vector3.MoveTowards(curPlayer.transform.position, mousePosition, speed * Time.deltaTime);
+        
+        
+        EnterARoom();
+        //Debug.Log(curPlayer.transform.position);
+
     }
 
+    private void EnterARoom()
+    {
+        Boolean enteredARoom = false;
+        int room = 1;
+        
+        //check if moved down the hall
+        if (Vector3.Distance(curPlayer.transform.position,new Vector3(445,300,0))< 50f)
+        {
+            SceneManager.LoadScene("Moving");
+        }
+         //check if entered door0
+        if (Vector3.Distance(curPlayer.transform.position,doorPositions[0])< 50f)
+        {
+            enteredARoom = true;
+           // room = 0;
+
+        }
+        //check if entered door1
+        if (Vector3.Distance(curPlayer.transform.position,doorPositions[1])< 50f)
+        {
+            enteredARoom = true;
+            // room = 0;
+        }
+        //check if entered door2
+        if (Vector3.Distance(curPlayer.transform.position,doorPositions[2])< 50f)
+        {
+            enteredARoom = true;
+            // room = 0;
+        }
+        //check if entered door3
+        if (Vector3.Distance(curPlayer.transform.position,doorPositions[3])< 50f)
+        {
+            enteredARoom = true;
+            // room = 0;
+        }
+        //check if entered door4
+        if (Vector3.Distance(curPlayer.transform.position,doorPositions[4])< 50f)
+        {
+            enteredARoom = true;
+            // room = 0;
+        }
+       
+        //check if entered door5
+        if (Vector3.Distance(curPlayer.transform.position,doorPositions[5])< 50f)
+        {
+            enteredARoom = true;
+            // room = 0;
+        }
+
+        if (enteredARoom)
+        {
+            List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+            {
+                new("roomId", room),
+                new("userId", playerId)
+            };
+            httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
+            SceneManager.LoadScene("Room");
+        }
+    }
     private void SendPosition(Vector3 pos)
     {
         string jsonPos = JsonConvert.SerializeObject(new PositionDTO(playerId, pos.x, pos.y));
@@ -159,7 +228,7 @@ public class MovingScript : MonoBehaviour
         // Assign the sprite to the SpriteRenderer component and load img
         spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(avatarPosition.Item1));
 
-        spriteRenderer.transform.localScale = new Vector3(8f, 8f, 4f);
+        spriteRenderer.transform.localScale = new Vector3(3f, 3f, 3f);
         
         character.transform.position = new Vector3(avatarPosition.Item2.GetX(), avatarPosition.Item2.GetY());
         
@@ -213,4 +282,28 @@ public class MovingScript : MonoBehaviour
 
         return path;
     }
+
+    private void getDoors()
+    {
+        //set doors positions
+        doorPositions = new Vector3[]
+        {
+            new Vector3(834, 203, 0), new Vector3(709, 248, 0), new Vector3(608, 255, 0), new Vector3(53, 181, 0),
+            new Vector3(179, 258, 0), new Vector3(275, 254)
+        };
+        
+        
+        //get all rooms
+        var res = httpRequest.SendDataToServer(null, "", "/rooms", "GET");
+        if (res.Item1 == 200)
+        {
+            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
+            Rooms allRooms = new Rooms(roomsDto);
+            Dictionary<int,string> roomsForHall = allRooms.getRoomsForHall();
+            Debug.Log(roomsForHall.ToString());
+        }
+
+    }
+   
+  
 }
