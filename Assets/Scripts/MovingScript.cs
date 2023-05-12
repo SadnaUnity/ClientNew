@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Mime;
 using Classes.DTO;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class MovingScript : MonoBehaviour
@@ -22,6 +25,8 @@ public class MovingScript : MonoBehaviour
     [SerializeField] private GameObject background;
     private HttpRequest httpRequest;
     private Vector3[] doorPositions; 
+    public Text door0,door1,door2,door3,door4,door5;
+
     
     // Start is called before the first frame update
     void Start()
@@ -107,7 +112,7 @@ public class MovingScript : MonoBehaviour
         int room = 1;
         
         //check if moved down the hall
-        if (Vector3.Distance(curPlayer.transform.position,new Vector3(445,300,0))< 50f)
+        if (Vector3.Distance(curPlayer.transform.position,new Vector3(957,646,0))< 100f)
         {
             SceneManager.LoadScene("Moving");
         }
@@ -312,7 +317,19 @@ public class MovingScript : MonoBehaviour
             RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
             Rooms allRooms = new Rooms(roomsDto);
             Dictionary<int,string> roomsForHall = allRooms.getRoomsForHall();
-            Debug.Log(roomsForHall.ToString());
+            List<int> keys = new List<int>();
+            foreach (var VARIABLE in roomsForHall.Keys)
+            {
+                keys.Add(VARIABLE);
+            }
+            //add room names to UI
+            door0.text = roomsForHall[keys[0]].ToString();
+            door1.text = roomsForHall[keys[1]].ToString();
+            door2.text = roomsForHall[keys[2]].ToString();
+            door3.text = roomsForHall[keys[3]].ToString();
+            door4.text = roomsForHall[keys[4]].ToString();
+            door5.text = roomsForHall[keys[5]].ToString();
+
         }
 
     }
