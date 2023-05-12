@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -6,73 +7,43 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class ChatScript:MonoBehaviour
 {
-    public string ipAddress = "127.0.0.1";
-    public int port = 9000;
+    private string ipAddress = "127.0.0.1";
+    private int port = 9000;
 
-    [SerializeField] private TMP_InputField inputField;
-    [SerializeField] private TMP_Text chatLogText;
-    [SerializeField] private ScrollRect chatLogScrollRect;
+    [SerializeField] private TMP_InputField msgIf;
+    [SerializeField] private GameObject chatPanel;
+    [SerializeField] private TMP_Text textObject;
+    [SerializeField] private GameObject scrollView;
+    private int msgCount;
+    private List<TMP_Text> msgList;
 
-    private TcpClient client;
-    private NetworkStream stream;
-
-    private async void Start()
+    public void Start()
     {
-        // Connect to the server
-        try
-        {
-            client = new TcpClient();
-            await client.ConnectAsync(ipAddress, port);
-            stream = client.GetStream();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error connecting to server: {ex.Message}");
-            return;
-        }
-
-        // Start receiving messages
-        _ = ReceiveMessages();
+        msgCount = 0;
+        msgList = new List<TMP_Text>();
     }
 
-    private async Task ReceiveMessages()
+    public void SendMsg()
     {
-        while (true)
+        if (msgCount > 15)
         {
-            // Read incoming messages
-            byte[] buffer = new byte[1024];
-            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-            string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-            // Update the chat log UI
-            chatLogText.text += message;
-            chatLogText.text += '\n';
-            chatLogScrollRect.verticalNormalizedPosition = 0f;
+            Destroy(msgList[msgCount - 16]);
         }
-    }
+        string msg = msgIf.text;
+        msgIf.text = "";
 
-    public async void OnSendMsg()
-    {
-        // Get the message text from the input field
-        string message = inputField.text;
-        if (string.IsNullOrEmpty(message))
-        {
-            return;
-        }
-
-        // Send the message to the server
-        byte[] buffer = Encoding.UTF8.GetBytes(message);
-        await stream.WriteAsync(buffer, 0, buffer.Length);
+        TMP_Text msgObject = Instantiate(textObject, chatPanel.transform);
+        msgList.Add(msgObject);
+        msgObject.text = msg;
+        msgCount++;
         
-        // Update the chat log UI
-        chatLogText.text += message;
-        chatLogText.text += '\n';
-        chatLogScrollRect.verticalNormalizedPosition = 0f;
-        
-        // Clear the input field
-        inputField.text = "";
+        ScrollRect scrollRect = scrollView.GetComponent<ScrollRect>();
+        scrollRect.verticalNormalizedPosition = 0f;
     }
+
+
 }
