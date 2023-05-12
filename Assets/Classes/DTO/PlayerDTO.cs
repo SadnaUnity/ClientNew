@@ -14,7 +14,7 @@ public class PlayerDTO
 
    public PlayerDTO(Player player)
    {
-      userId = player.GetId();
+      userId = player.GetUserId();
       message = "";
       avatar = new AvatarDTO(player.GetAvatar());
    }

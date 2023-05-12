@@ -17,4 +17,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Moving.unity
     guid: 0119a350cf8912749b2127952c8ba7f3
+  - enabled: 1
+    path: Assets/Scenes/ChooseAccessory.unity
+    guid: 88b74793e986e4cfb8368ee385046d3d
+  - enabled: 1
+    path: Assets/Scenes/ChooseAvatar.unity
+    guid: bc3f17b6cc72141d48c5e4a6345a9471
+  - enabled: 1
+    path: Assets/Scenes/ChooseNameAndPassword.unity
+    guid: 9d7875fb9f75d4819ab97378a50c2541
   m_configObjects: {}
