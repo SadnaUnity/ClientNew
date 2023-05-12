@@ -1,19 +1,24 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using System.IO;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.EventSystems;
-using Button = UnityEngine.UIElements.Button;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UI.Image;
 
 public class PosterUploader : MonoBehaviour
 {
     [SerializeField] private Canvas canvas;
-    [SerializeField] private GameObject panel;
-    [SerializeField] private TMP_InputField posterNameIF;
+    [SerializeField] private TMP_InputField posterNameIf;
+    [SerializeField] private Button uploadPosterBtn;
+    [SerializeField] private Button choosePosterPositionBtn;
+    [SerializeField] private Button lockPosterPositionBtn;
+    [SerializeField] private Button sendPosterBtn;
+    
     private HttpRequest httpRequest;
     private GameObject poster;
     private ImagePositionHandler imgPositionHandler;
@@ -22,12 +27,50 @@ public class PosterUploader : MonoBehaviour
     
     public void Start()
     {
-        panel.SetActive(false);
+        ChangeInteractable(1);
         httpRequest = new HttpRequest();
         poster = new GameObject("poster");
         poster.transform.SetParent(canvas.transform);
         playerData = PlayerDataManager.PlayerData;
     }
+
+    private void ChangeInteractable(int i)
+    {
+        switch (i)
+        {
+            case 1:
+                uploadPosterBtn.interactable = true;
+                choosePosterPositionBtn.interactable = false;
+                lockPosterPositionBtn.interactable = false;
+                sendPosterBtn.interactable = false;
+                posterNameIf.interactable = false;
+                break;
+            case 2:
+                uploadPosterBtn.interactable = false;
+                choosePosterPositionBtn.interactable = true;
+                lockPosterPositionBtn.interactable = false;
+                sendPosterBtn.interactable = false;
+                posterNameIf.interactable = false;
+                break;
+            case 3:
+                uploadPosterBtn.interactable = false;
+                choosePosterPositionBtn.interactable = false;
+                lockPosterPositionBtn.interactable = true;
+                sendPosterBtn.interactable = false;
+                posterNameIf.interactable = false;
+                break;
+            case 4:
+                uploadPosterBtn.interactable = false;
+                choosePosterPositionBtn.interactable = false;
+                lockPosterPositionBtn.interactable = false;
+                sendPosterBtn.interactable = true;
+                posterNameIf.interactable = true;
+                break;
+            default:
+                break;
+        }
+    }
+
     public void UploadPoster()
     {
         // Show file dialog to choose an image file
@@ -50,6 +93,7 @@ public class PosterUploader : MonoBehaviour
                 posterImgFile = bytes;
             }
         }
+        ChangeInteractable(2);
     }
 
     public void ChoosePosterPosition()
@@ -59,22 +103,22 @@ public class PosterUploader : MonoBehaviour
 
         // Enable the position handler script
         imgPositionHandler.enabled = true;
+        ChangeInteractable(3);
     }
     public void LockPosterPosition()
     {
         imgPositionHandler.enabled = false;
-        panel.SetActive(true);
+        ChangeInteractable(4);
     }
 
     public void SendPoster()
     {
-        panel.SetActive(false);
-        Vector3 posterPos = poster.transform.position;
+        Vector2 posterPos = poster.transform.position;
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("userId", playerData.GetUserId()),
             new("roomId", 1),
-            new("posterName", posterNameIF.text),
+            new("posterName", posterNameIf.text),
             new("xPos", posterPos.x),
             new("yPos", posterPos.y)
         };
