@@ -14,23 +14,25 @@ public class HttpRequest {
 
     public HttpRequest()
     {
-        //baseURL = "http://localhost:8080";
-        baseURL = "https://school-384409.oa.r.appspot.com";
+        baseURL = "http://localhost:8080";
+        //baseURL = "https://school-384409.oa.r.appspot.com";
     }
-    public Tuple<long, string> SendDataToServer(string posterName, int roomId, int userId, string fileName, byte[] fileData, string rsc) {
+    public Tuple<long, string> SendDataToServer(List<KeyValuePair<string, object>> queryParams, string fileName, byte[] fileData, string rsc) {
         using (var client = new HttpClient())
         using (var content = new MultipartFormDataContent())
         {
             // Add the posterName, roomId, and userId parameters as form data
-            content.Add(new StringContent(posterName), "posterName");
-            content.Add(new StringContent(roomId.ToString()), "roomId");
-            content.Add(new StringContent(userId.ToString()), "userId");
+            foreach (var queryParam in queryParams) {
+                content.Add(new StringContent(queryParam.Value.ToString()), queryParam.Key);
+            }
 
             // Add the file as form data
             var fileContent = new ByteArrayContent(fileData);
             fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
             content.Add(fileContent, "file", fileName);
-
+            /*byte[] bodyBytes = Encoding.UTF8.GetBytes(body);
+            int bodyLength = bodyBytes.Length;
+            request.ContentLength = bodyLength;*/
             // Send the request
             var response = client.PostAsync(baseURL + rsc , content).Result;
 
@@ -60,6 +62,9 @@ public class HttpRequest {
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
         request.Method = method;
         request.ContentType = "application/json";
+        byte[] bodyBytes = Encoding.UTF8.GetBytes(body);
+        int bodyLength = bodyBytes.Length;
+        request.ContentLength = bodyLength;
         
         // Add the body content to the request if there is any
         if (!string.IsNullOrEmpty(body))
