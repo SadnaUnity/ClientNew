@@ -1,11 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using Microsoft.Unity.VisualStudio.Editor;
+using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class RoomScript : MonoBehaviour
 {
-    
+
     private HttpRequest httpRequest;
     private Player playerData;
     [SerializeField] private GameObject background;
@@ -17,7 +23,9 @@ public class RoomScript : MonoBehaviour
         SpriteRenderer backroundspriteRenderer = background.AddComponent<SpriteRenderer>();
 
         // Set the background image as the sprite for the Sprite Renderer
-        backroundspriteRenderer.sprite = Resources.Load<Sprite>("Images/backrounnds/vecteezy_big-shuttle-window-on-spaceship-with-view-of-other-planets_6951237"); 
+        backroundspriteRenderer.sprite =
+            Resources.Load<Sprite>(
+                "Images/backrounnds/vecteezy_big-shuttle-window-on-spaceship-with-view-of-other-planets_6951237");
 
         // Set the sorting layer of the background object to a lower value
         backroundspriteRenderer.sortingLayerName = "Background";
@@ -29,15 +37,57 @@ public class RoomScript : MonoBehaviour
             new("roomId", playerData.GetRoomId()),
             new("userId", playerData.GetUserId())
         };
-        httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
-        
+        var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
+        if (res.Item1 == 200)
+        {
+            RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
+           
+                   List<PosterDTO> posters = roomDataDto.room.posters;
+                   foreach (var VARIABLE in posters)
+                   {
+                       // Load the image from the URL and set it as the sprite for the SpriteRenderer
+                       StartCoroutine(LoadImageFromURL(VARIABLE.fileUrl,new Vector3(VARIABLE.position.x, VARIABLE.position.y, 0)));
+                               
+                   } 
+        }
+        else
+        {
+            Debug.Log("error");
+        }
+       
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+
+    IEnumerator LoadImageFromURL(string url, Vector3 position)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Failed to load image from URL: " + request.error);
+            yield break;
+        }
+
+        Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+
+        GameObject poster = new GameObject();
+        poster.transform.position = position;
+        poster.transform.localScale = new Vector3(20f, 20f, 20f);
+        SpriteRenderer spriteRenderer = poster.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
     }
 
 
+
 }
+
+
+
