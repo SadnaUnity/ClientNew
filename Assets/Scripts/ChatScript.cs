@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Net.WebSockets;
-using System.Linq;
 
 public class ChatScript : MonoBehaviour
 {
@@ -32,7 +31,9 @@ public class ChatScript : MonoBehaviour
 
         try
         {
-            await clientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
+            var token = new CancellationToken();
+            clientWebSocket.Options.SetRequestHeader("userID", "1");
+            await clientWebSocket.ConnectAsync(serverUri, token);
             Debug.Log("Connected to server");
         }
         catch (Exception e)
@@ -49,48 +50,64 @@ public class ChatScript : MonoBehaviour
 
         while (clientWebSocket.State == WebSocketState.Open)
         {
-            try
+            WebSocketReceiveResult result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+            if (result.MessageType == WebSocketMessageType.Text)
             {
-                WebSocketReceiveResult result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                if (result.MessageType == WebSocketMessageType.Text)
-                {
-                    string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                Debug.Log($"Received message: {message}");
 
-                    // Display the message in the chat panel
-                    TMP_Text msgObject = Instantiate(textObject, chatPanel.transform);
-                    msgList.Add(msgObject);
-                    msgObject.text = message;
-                    msgCount++;
-
-                    ScrollRect scrollRect = scrollView.GetComponent<ScrollRect>();
-                    scrollRect.verticalNormalizedPosition = 0f;
-                }
+                AddMessageToChat(message);
             }
-            catch (WebSocketException e)
+            else if (result.MessageType == WebSocketMessageType.Close)
             {
-                Debug.LogError($"WebSocket error: {e.Message}");
+                Debug.Log("WebSocket connection closed by server");
                 break;
             }
         }
+
+        Debug.Log("WebSocket connection closed");
     }
 
-    public async void SendMsg()
+    private void AddMessageToChat(string message)
     {
-        string msg = msgIf.text;
-        msgIf.text = "";
+        TMP_Text newMsg = Instantiate(textObject, chatPanel.transform);
+        newMsg.text = message;
 
-        if (clientWebSocket.State == WebSocketState.Open)
+        msgList.Add(newMsg);
+        msgCount++;
+
+        if (msgCount > 100)
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(msg);
-            await clientWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
-            // Display the message in the chat panel
-            TMP_Text msgObject = Instantiate(textObject, chatPanel.transform);
-            msgList.Add(msgObject);
-            msgObject.text = msg;
-            msgCount++;
-
-            ScrollRect scrollRect = scrollView.GetComponent<ScrollRect>();
-            scrollRect.verticalNormalizedPosition = 0f;
+            Destroy(msgList[0].gameObject);
+            msgList.RemoveAt(0);
+            msgCount--;
         }
+
+        scrollView.GetComponent<ScrollRect>().verticalNormalizedPosition = 0;
+    }
+
+    public void SendMsg()
+    {
+        string message = msgIf.text;
+
+        if (!string.IsNullOrEmpty(message))
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+
+            clientWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+
+            msgIf.text = "";
+        }
+    }
+
+    private async Task CloseWebSocket()
+    {
+        await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+    }
+
+    private void OnApplicationQuit()
+    {
+        CloseWebSocket().Wait();
     }
 }
