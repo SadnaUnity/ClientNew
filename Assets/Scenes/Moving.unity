@@ -741,14 +741,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  canvas: {fileID: 1208979753}
-  background: {fileID: 143926333}
-  door0: {fileID: 91972965}
-  door1: {fileID: 224379749}
-  door2: {fileID: 171522230}
-  door3: {fileID: 714056260}
-  door4: {fileID: 644974906}
-  door5: {fileID: 1769853853}
 --- !u!4 &958010121
 Transform:
   m_ObjectHideFlags: 0
@@ -951,3 +943,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1769853851}
   m_CullTransparentMesh: 1
+--- !u!1 &2001407788
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2001407790}
+  - component: {fileID: 2001407789}
+  m_Layer: 0
+  m_Name: HallController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2001407789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001407788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3625fd580f52640cba0e0f936e98564b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  background: {fileID: 143926333}
+  canvas: {fileID: 1208979753}
+  door0: {fileID: 91972965}
+  door1: {fileID: 224379749}
+  door2: {fileID: 171522230}
+  door3: {fileID: 714056260}
+  door4: {fileID: 644974906}
+  door5: {fileID: 1769853853}
+  movingController: {fileID: 958010119}
+--- !u!4 &2001407790
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001407788}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 912.2311, y: 527.61414, z: -1.7219183}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
