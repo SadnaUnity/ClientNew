@@ -21,12 +21,12 @@ public class Menu : MonoBehaviour
         if (showMenu)
         {
             menuPanel.SetActive(true);
-            btnRectTransform.anchoredPosition = new Vector2(-610, 490);
+            btnRectTransform.anchoredPosition = new Vector2(-875, 500);
         }
         else
         {
             menuPanel.SetActive(false);
-            btnRectTransform.anchoredPosition = new Vector2(-910, 490);
+            btnRectTransform.anchoredPosition = new Vector2(-1175, 500);
         }
         
         
