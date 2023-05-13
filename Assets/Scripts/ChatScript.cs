@@ -20,7 +20,8 @@ public class ChatScript : MonoBehaviour
     [SerializeField] private GameObject scrollView;
     private int msgCount;
     private List<TMP_Text> msgList;
-
+    private bool isClosing = false;
+    
     public async void Start()
     {
         msgCount = 0;
@@ -87,27 +88,46 @@ public class ChatScript : MonoBehaviour
         scrollView.GetComponent<ScrollRect>().verticalNormalizedPosition = 0;
     }
 
-    public void SendMsg()
+    public async void SendMsg()
     {
         string message = msgIf.text;
-
         if (!string.IsNullOrEmpty(message))
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message);
 
-            clientWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            await clientWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
 
             msgIf.text = "";
         }
     }
+    
+    private async void OnApplicationQuit()
+    {
+        if (isClosing) return;
+        isClosing = true;
+
+        Debug.Log("Closing connection..");
+        await CloseWebSocket();
+        Debug.Log("Connection is closed");
+    }
 
     private async Task CloseWebSocket()
     {
-        await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+        if (clientWebSocket == null) return;
+
+        try
+        {
+            await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+        }
+        catch (WebSocketException e)
+        {
+            Debug.LogError($"Error closing WebSocket: {e.Message}");
+        }
+        finally
+        {
+            clientWebSocket.Dispose();
+            clientWebSocket = null;
+        }
     }
 
-    private void OnApplicationQuit()
-    {
-        CloseWebSocket().Wait();
-    }
 }
