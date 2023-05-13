@@ -1,78 +1,133 @@
 using System;
-using System.Net;
-using System.Net.Sockets;
+using System.Collections.Generic;
+using System.Net.WebSockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class ChatScript:MonoBehaviour
+public class ChatScript : MonoBehaviour
 {
-    public string ipAddress = "127.0.0.1";
-    public int port = 9000;
+    private string ipAddress = "127.0.0.1";
+    private int port = 8080;
+    private ClientWebSocket clientWebSocket;
 
-    [SerializeField] private TMP_InputField inputField;
-    [SerializeField] private TMP_Text chatLogText;
-    [SerializeField] private ScrollRect chatLogScrollRect;
-
-    private TcpClient client;
-    private NetworkStream stream;
-
-    private async void Start()
+    [SerializeField] private TMP_InputField msgIf;
+    [SerializeField] private GameObject chatPanel;
+    [SerializeField] private TMP_Text textObject;
+    [SerializeField] private GameObject scrollView;
+    private int msgCount;
+    private List<TMP_Text> msgList;
+    private bool isClosing = false;
+    
+    public async void Start()
     {
-        // Connect to the server
+        msgCount = 0;
+        msgList = new List<TMP_Text>();
+
+        clientWebSocket = new ClientWebSocket();
+        Uri serverUri = new Uri($"ws://{ipAddress}:{port}/chat");
+
         try
         {
-            client = new TcpClient();
-            await client.ConnectAsync(ipAddress, port);
-            stream = client.GetStream();
+            var token = new CancellationToken();
+            clientWebSocket.Options.SetRequestHeader("userID", "1");
+            await clientWebSocket.ConnectAsync(serverUri, token);
+            Debug.Log("Connected to server");
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Debug.LogError($"Error connecting to server: {ex.Message}");
-            return;
+            Debug.LogError($"Error connecting to server: {e.Message}");
         }
 
-        // Start receiving messages
-        _ = ReceiveMessages();
+        ReceiveMessages();
     }
 
-    private async Task ReceiveMessages()
+    private async void ReceiveMessages()
     {
-        while (true)
-        {
-            // Read incoming messages
-            byte[] buffer = new byte[1024];
-            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-            string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        byte[] buffer = new byte[1024];
 
-            // Update the chat log UI
-            chatLogText.text += message;
-            chatLogText.text += '\n';
-            chatLogScrollRect.verticalNormalizedPosition = 0f;
+        while (clientWebSocket.State == WebSocketState.Open)
+        {
+            WebSocketReceiveResult result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+            if (result.MessageType == WebSocketMessageType.Text)
+            {
+                string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                Debug.Log($"Received message: {message}");
+
+                AddMessageToChat(message);
+            }
+            else if (result.MessageType == WebSocketMessageType.Close)
+            {
+                Debug.Log("WebSocket connection closed by server");
+                break;
+            }
         }
+
+        Debug.Log("WebSocket connection closed");
     }
 
-    public async void OnSendMsg()
+    private void AddMessageToChat(string message)
     {
-        // Get the message text from the input field
-        string message = inputField.text;
-        if (string.IsNullOrEmpty(message))
+        TMP_Text newMsg = Instantiate(textObject, chatPanel.transform);
+        newMsg.text = message;
+
+        msgList.Add(newMsg);
+        msgCount++;
+
+        if (msgCount > 100)
         {
-            return;
+            Destroy(msgList[0].gameObject);
+            msgList.RemoveAt(0);
+            msgCount--;
         }
 
-        // Send the message to the server
-        byte[] buffer = Encoding.UTF8.GetBytes(message);
-        await stream.WriteAsync(buffer, 0, buffer.Length);
-        
-        // Update the chat log UI
-        chatLogText.text += message;
-        chatLogText.text += '\n';
-        chatLogScrollRect.verticalNormalizedPosition = 0f;
-        
-        // Clear the input field
-        inputField.text = "";
+        scrollView.GetComponent<ScrollRect>().verticalNormalizedPosition = 0;
     }
+
+    public async void SendMsg()
+    {
+        string message = msgIf.text;
+        if (!string.IsNullOrEmpty(message))
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+
+            await clientWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+
+            msgIf.text = "";
+        }
+    }
+    
+    private async void OnApplicationQuit()
+    {
+        if (isClosing) return;
+        isClosing = true;
+
+        Debug.Log("Closing connection..");
+        await CloseWebSocket();
+        Debug.Log("Connection is closed");
+    }
+
+    private async Task CloseWebSocket()
+    {
+        if (clientWebSocket == null) return;
+
+        try
+        {
+            await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+        }
+        catch (WebSocketException e)
+        {
+            Debug.LogError($"Error closing WebSocket: {e.Message}");
+        }
+        finally
+        {
+            clientWebSocket.Dispose();
+            clientWebSocket = null;
+        }
+    }
+
 }
