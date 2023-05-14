@@ -65,7 +65,7 @@ public class MovingScript : MonoBehaviour
     {
        MovePlayer();
         
-        //Debug.Log(curPlayer.transform.position);
+       // Debug.Log(curPlayer.transform.position);
 
     }
 
