@@ -29,8 +29,6 @@ public class PosterUploader : MonoBehaviour
     {
         ChangeInteractable(1);
         httpRequest = new HttpRequest();
-        poster = new GameObject("poster");
-        poster.transform.SetParent(canvas.transform);
         playerData = PlayerDataManager.PlayerData;
     }
 
@@ -86,6 +84,8 @@ public class PosterUploader : MonoBehaviour
 
             if (texture != null)
             {
+                poster = new GameObject("poster");
+                poster.transform.SetParent(canvas.transform);
                 Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
                 Image img = poster.AddComponent<Image>();
                 img.sprite = sprite;
@@ -122,7 +122,9 @@ public class PosterUploader : MonoBehaviour
             new("xPos", posterPos.x),
             new("yPos", posterPos.y)
         };
+        posterNameIf.text = "";
         var res = httpRequest.SendDataToServer(queryParams, "file", posterImgFile, "/poster");
+        ChangeInteractable(1);
     }
 
     private Texture2D LoadTextureFromFile(string filePath)
