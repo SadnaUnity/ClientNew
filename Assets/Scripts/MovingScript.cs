@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Mime;
 using Classes.DTO;
 using Newtonsoft.Json;
@@ -175,10 +176,13 @@ public class MovingScript : MonoBehaviour
 
     private void InitPlayerOnScreen()
     {
-        foreach (int key in playersOnScreen.Keys)
+        for (int i = 0; i < playersOnScreen.Count; i++)
         {
+            var key = playersOnScreen.Keys.ElementAt(i);
+            // Do something with key
             playersOnScreen[key] = false;
         }
+
     }
 
     private List<Tuple<Avatar, Position>> GetAllAvatarsPositions(PosDataDTO playersPositions)
