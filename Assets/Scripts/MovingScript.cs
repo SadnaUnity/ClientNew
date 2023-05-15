@@ -179,7 +179,6 @@ public class MovingScript : MonoBehaviour
         for (int i = 0; i < playersOnScreen.Count; i++)
         {
             var key = playersOnScreen.Keys.ElementAt(i);
-            // Do something with key
             playersOnScreen[key] = false;
         }
 
