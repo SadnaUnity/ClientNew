@@ -16,7 +16,7 @@ public class HallScript : MonoBehaviour
     private Vector3[] doorPositions; 
     private Dictionary<int, string> roomsForHall;
     private GameObject curPlayer;
-
+    
     [SerializeField] private GameObject movingController;
     // Start is called before the first frame update
     void Start()
