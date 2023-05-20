@@ -40,15 +40,16 @@ public class RoomScript : MonoBehaviour
         var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
         if (res.Item1 == 200)
         {
-            RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
+            RoomStatusDTO roomStatusDto = JsonConvert.DeserializeObject<RoomStatusDTO>(res.Item2);
            
-                   List<PosterDTO> posters = roomDataDto.room.posters;
+                  /* List<PosterDTO> posters = roomStatusDto.room.posters;
                    foreach (var VARIABLE in posters)
                    {
                        // Load the image from the URL and set it as the sprite for the SpriteRenderer
                        StartCoroutine(LoadImageFromURL(VARIABLE.fileUrl,new Vector3(VARIABLE.position.x, VARIABLE.position.y, 0)));
                                
                    } 
+                   */
         }
         else
         {

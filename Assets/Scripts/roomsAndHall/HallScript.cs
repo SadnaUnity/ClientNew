@@ -16,11 +16,14 @@ public class HallScript : MonoBehaviour
     private Vector3[] doorPositions; 
     private Dictionary<int, string> roomsForHall;
     private GameObject curPlayer;
-    
+    private Player playerData;
+
+
     [SerializeField] private GameObject movingController;
     // Start is called before the first frame update
     void Start()
     {
+        playerData = PlayerDataManager.PlayerData;
         // Create a background game objectGameObject background = new GameObject("Background");
         background.transform.SetParent(canvas.transform);
         // Attach a Sprite Renderer component to the background game object
@@ -112,7 +115,11 @@ public class HallScript : MonoBehaviour
         
         
         //get all rooms
-        var res = httpRequest.SendDataToServer(null, "", "/rooms", "GET");
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        var res = httpRequest.SendDataToServer(queryParams, "", "/hall", "GET");
         if (res.Item1 == 200)
         {
             RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);

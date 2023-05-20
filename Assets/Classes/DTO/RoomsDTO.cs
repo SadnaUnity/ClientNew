@@ -6,7 +6,7 @@ using UnityEngine;
 public class RoomsDTO
 {
     public string message { set; get; }
-    public Dictionary<int, string> roomsData { set; get; }
+    public List <RoomStatusDTO> roomStatuses { set; get; }
     
     public RoomsDTO()
     {
