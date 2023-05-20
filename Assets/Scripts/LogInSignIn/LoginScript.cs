@@ -17,7 +17,8 @@ public class LoginScript : MonoBehaviour
     // Start is called before the first frame update
     [SerializeField] private TMP_InputField username;
     [SerializeField] private TMP_InputField password;
-
+    [SerializeField] private TMP_Text errorText;
+    
     private string rsc;
     private HttpRequest httpReq;
     public void Start()
@@ -46,9 +47,10 @@ public class LoginScript : MonoBehaviour
             Debug.Log("Login success");
             SceneManager.LoadScene("Moving");
         }
-        else
+        else if(res.Item1 == 400)
         {
-            Debug.Log("Error with login!");
+            PlayerDTO playerDto = JsonConvert.DeserializeObject<PlayerDTO>(res.Item2);
+            errorText.text = playerDto.message;
         }
     }
     

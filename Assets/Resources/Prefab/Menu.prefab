@@ -421,8 +421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   msgIf: {fileID: 3451200059009144496}
   chatPanel: {fileID: 8487003494970686744}
-  textObject: {fileID: 6231124839678797886, guid: 0c60c4cea1ae6a8449331bee19511d54,
-    type: 3}
+  textObject: {fileID: 6231124839678797886, guid: 0c60c4cea1ae6a8449331bee19511d54, type: 3}
   scrollView: {fileID: 6997775956172364012}
 --- !u!1 &2045590346787571312
 GameObject:
@@ -3111,7 +3110,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5060234764544708518}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6578976051518387802
 MonoBehaviour:
@@ -4109,7 +4108,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 283, y: 450.44003}
+  m_AnchoredPosition: {x: 283, y: 450.44}
   m_SizeDelta: {x: -283, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6913599109898089065
@@ -4407,8 +4406,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1669441774394000979}
   m_HandleRect: {fileID: 1264163293410375708}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.0000000677506
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
