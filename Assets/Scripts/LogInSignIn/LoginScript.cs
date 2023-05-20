@@ -53,7 +53,7 @@ public class LoginScript : MonoBehaviour
     }
     
     public void ClickedBack(){ 
-        SceneManager.LoadScene("FirstScene");
+        SceneManager.LoadScene("First");
     }
 
     
