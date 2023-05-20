@@ -116,11 +116,13 @@ public class PosterUploader : MonoBehaviour
         Vector2 posterPos = poster.transform.position;
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
-            new("userId", playerData.GetUserId()),
-            new("roomId", 1),
             new("posterName", posterNameIf.text),
             new("xPos", posterPos.x),
-            new("yPos", posterPos.y)
+            new("yPos", posterPos.y),
+            new("roomId", playerData.GetRoomId()),
+            new("userId", playerData.GetUserId()),
+           
+            
         };
         posterNameIf.text = "";
         var res = httpRequest.SendDataToServer(queryParams, "file", posterImgFile, "/poster");

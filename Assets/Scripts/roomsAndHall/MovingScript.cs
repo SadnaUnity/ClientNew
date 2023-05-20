@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Mime;
 using Classes.DTO;
 using Newtonsoft.Json;
@@ -21,14 +22,11 @@ public class MovingScript : MonoBehaviour
     private int playerId;
     private GameObject curPlayer;
     private Dictionary<int, GameObject> playersById;
-    
+    private Dictionary<int, bool> playersOnScreen;
 
     // Start is called before the first frame update
     void Start()
     {
-      
-     
-        
         rsc = "/updatePosition";
         speed = 1000f;
         httpReq = new HttpRequest();
@@ -38,9 +36,14 @@ public class MovingScript : MonoBehaviour
 
         playersById = new Dictionary<int, GameObject>()
         {
-            {playerId, curPlayer}
+            { playerId, curPlayer }
         };
 
+        playersOnScreen = new Dictionary<int, bool>()
+        {
+            { playerId, true }
+        };
+        
         // Add a SpriteRenderer component to the new GameObject
         SpriteRenderer spriteRenderer = curPlayer.AddComponent<SpriteRenderer>();
         
@@ -116,11 +119,15 @@ public class MovingScript : MonoBehaviour
             {
                 // Parse the JSON response into a list of players
                 PosDataDTO playersPositions = JsonConvert.DeserializeObject<PosDataDTO>(res.Item2);
-                List<Tuple<Avatar, Position>> avatarPositions = GetAllAvatarsPostions(playersPositions);
+                List<Tuple<Avatar, Position>> avatarPositions = GetAllAvatarsPositions(playersPositions);
+
+                InitPlayerOnScreen();
+                
                 // Update the positions of all other players in the game scene
                 foreach (Tuple<Avatar, Position> avatarPosition in avatarPositions)
                 {
                     int id = avatarPosition.Item1.GetId();
+                    playersOnScreen[id] = true;
                     if (id != playerId)
                     {
                         //If not on screen yet
@@ -128,6 +135,7 @@ public class MovingScript : MonoBehaviour
                         {
                             playersById.Add(id, CreateGameObject(avatarPosition));
                         }
+                        
                         //Already on screen - move him slowly towards target
                         else
                         {
@@ -140,6 +148,8 @@ public class MovingScript : MonoBehaviour
                         }
                     }
                 }
+
+                RemoveLogoutPlayerFromScreen();
             }
             else
             {
@@ -151,7 +161,30 @@ public class MovingScript : MonoBehaviour
         }
     }
 
-    private List<Tuple<Avatar, Position>> GetAllAvatarsPostions(PosDataDTO playersPositions)
+    private void RemoveLogoutPlayerFromScreen()
+    {
+        foreach (int key in playersOnScreen.Keys)
+        {
+            if (!playersOnScreen[key])
+            {
+                GameObject playerToDelete = playersById[key];
+                Destroy(playerToDelete);
+                playersById.Remove(key);
+            }
+        }
+    }
+
+    private void InitPlayerOnScreen()
+    {
+        for (int i = 0; i < playersOnScreen.Count; i++)
+        {
+            var key = playersOnScreen.Keys.ElementAt(i);
+            playersOnScreen[key] = false;
+        }
+
+    }
+
+    private List<Tuple<Avatar, Position>> GetAllAvatarsPositions(PosDataDTO playersPositions)
     {
         List<Tuple<Avatar, Position>> res = new List<Tuple<Avatar, Position>>();
         List<AvatarPositionDTO> avatarPositions = playersPositions.avatarPositions;
@@ -233,7 +266,4 @@ public class MovingScript : MonoBehaviour
         return curPlayer;
     }
     
-
-   
-  
 }
