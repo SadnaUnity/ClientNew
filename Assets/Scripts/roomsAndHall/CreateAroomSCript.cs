@@ -48,8 +48,8 @@ public class CreateAroomSCript : MonoBehaviour
         var res = httpRequest.SendDataToServer(queryParams, "", "/room", "POST");
         if (res.Item1 == 200)
         {
-            RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
-            PlayerDataManager.PlayerData.SetRoomId(roomDataDto.roomId);
+            RoomStatusDTO roomStatusDto = JsonConvert.DeserializeObject<RoomStatusDTO>(res.Item2);
+            PlayerDataManager.PlayerData.SetRoomId(roomStatusDto.roomId);
             SceneManager.LoadScene("Room");
 
         }
