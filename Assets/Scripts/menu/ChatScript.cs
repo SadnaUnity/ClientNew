@@ -33,7 +33,7 @@ public class ChatScript : MonoBehaviour
         try
         {
             var token = new CancellationToken();
-            clientWebSocket.Options.SetRequestHeader("userID", "1");
+            clientWebSocket.Options.SetRequestHeader("userID", PlayerDataManager.PlayerData.GetUserId().ToString());
             await clientWebSocket.ConnectAsync(serverUri, token);
             Debug.Log("Connected to server");
         }
@@ -98,6 +98,8 @@ public class ChatScript : MonoBehaviour
             await clientWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
 
             msgIf.text = "";
+
+            //AddMessageToChat(message);
         }
     }
     

@@ -32,30 +32,28 @@ public class RoomScript : MonoBehaviour
         backroundspriteRenderer.sortingOrder = -1;
         httpRequest = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
+        
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("roomId", playerData.GetRoomId()),
             new("userId", playerData.GetUserId())
         };
-        var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
+        var res = httpRequest.SendDataToServer(queryParams, "", "/room/" + playerData.GetRoomId().ToString(), "GET");
         if (res.Item1 == 200)
         {
-            RoomStatusDTO roomStatusDto = JsonConvert.DeserializeObject<RoomStatusDTO>(res.Item2);
-           
-                  /* List<PosterDTO> posters = roomStatusDto.room.posters;
-                   foreach (var VARIABLE in posters)
-                   {
-                       // Load the image from the URL and set it as the sprite for the SpriteRenderer
-                       StartCoroutine(LoadImageFromURL(VARIABLE.fileUrl,new Vector3(VARIABLE.position.x, VARIABLE.position.y, 0)));
+            RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
+            List<PosterDTO> postersDto = roomDataDto.room.posters;
+            foreach (var posterDto in postersDto)
+            {
+                // Load the image from the URL and set it as the sprite for the SpriteRenderer
+                StartCoroutine(LoadImageFromURL(posterDto.fileUrl,new Vector3(posterDto.position.x, posterDto.position.y, 0)));
                                
-                   } 
-                   */
+            } 
         }
         else
         {
-            Debug.Log("error");
+            Debug.Log("Error get room id: " + playerData.GetRoomId());
         }
-       
     }
 
     // Update is called once per frame

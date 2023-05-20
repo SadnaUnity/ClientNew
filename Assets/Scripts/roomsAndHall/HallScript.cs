@@ -59,39 +59,39 @@ public class HallScript : MonoBehaviour
             SceneManager.LoadScene("Moving");
         }
         //check if entered door0
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[0])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[0])< 100f)
         {
             enteredARoom = true;
             room = keys[0];
 
         }
         //check if entered door1
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[1])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[1])< 100f)
         {
             enteredARoom = true;
             room = keys[1];
         }
         //check if entered door2
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[2])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[2])< 100f)
         {
             enteredARoom = true;
             room = keys[2];
         }
         //check if entered door3
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[3])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[3])< 100f)
         {
             enteredARoom = true;
             room = keys[3];
         }
         //check if entered door4
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[4])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[4])< 100f)
         {
             enteredARoom = true;
             room = keys[4];
         }
        
         //check if entered door5
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[5])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[5])< 100f)
         {
             enteredARoom = true;
             room = keys[5];
@@ -99,9 +99,23 @@ public class HallScript : MonoBehaviour
 
         if (enteredARoom)
         {
-           
-            PlayerDataManager.PlayerData.SetRoomId(room);
-            SceneManager.LoadScene("Room");
+            List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+            {
+                new("roomId", room),
+                new("userId", playerData.GetUserId())
+            };
+            var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
+            if (res.Item1 == 200)
+            {
+                PlayerDataManager.PlayerData.SetRoomId(room);
+                SceneManager.LoadScene("Room");
+            }
+            else
+            {
+                Debug.Log("user is not a room member!");
+                //TODO: give msg to player in UI that he cant enter the room
+            }
+            
         }
     }
     private void getDoors()
