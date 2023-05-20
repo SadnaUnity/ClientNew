@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class Rooms
 {
-private Dictionary<int, string> rooms;
-
+private Dictionary<int, RoomStatus> roomsDic;
     public Rooms(RoomsDTO roomsDTO)
     {
-        rooms = roomsDTO.roomsData;
+        this.roomsDic = new Dictionary<int, RoomStatus>();
+        foreach (var roomStatusDTO in roomsDTO.roomStatuses)
+        {
+            roomsDic.Add(roomStatusDTO.roomId,new RoomStatus(roomStatusDTO));
+            
+        }
+
     }
 
     public Dictionary<int, string> getRoomsForHall()
     {
         Dictionary<int, string> selectedRooms = new Dictionary<int, string>();
 
-        List<int> roomKeys = new List<int>(rooms.Keys);
+        List<int> roomKeys = new List<int>(roomsDic.Keys);
         int roomsToSelect = Mathf.Min(6, roomKeys.Count);
         
         // Create a random number generator
@@ -28,10 +33,10 @@ private Dictionary<int, string> rooms;
 
             // Get the room key and name based on the random index
             int randomKey = roomKeys[randomIndex];
-            string roomName = rooms[randomKey];
-
+            RoomStatus roomStatus = roomsDic[randomKey];
+            
             // Add the room to the selectedRooms dictionary
-            selectedRooms.Add(randomKey, roomName);
+            selectedRooms.Add(randomKey, roomStatus.GetRoomName());
 
             // Remove the selected room's key from the keys list to avoid duplicates
             roomKeys.RemoveAt(randomIndex);
