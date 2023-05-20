@@ -1,13 +1,14 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 [Serializable]
 public class PlayerDTO
 { 
-   public int userId { set; get; }
+   [CanBeNull] public AvatarDTO avatar{ set; get; }
    public string message{ set; get; }
-   public AvatarDTO avatar{ set; get; }
-   public string username { set; get; }
+   public int userId { set; get; }
+   [CanBeNull] public string username { set; get; }
    public PlayerDTO()
    {
    }

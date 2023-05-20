@@ -26,7 +26,7 @@ public class RegisterScript : MonoBehaviour
     {
         if (usernameTF.text == "")
         {
-            errorText.text = "userName is empty!";
+            errorText.text = "username filed is empty!";
             ClearFields();
             return;
         }
@@ -64,7 +64,8 @@ public class RegisterScript : MonoBehaviour
         }
         else
         {
-            errorText.text = "Username already exists!";
+            PlayerDTO playerDto = JsonConvert.DeserializeObject<PlayerDTO>(res.Item2);
+            errorText.text = playerDto.message;
             ClearFields();
         }
     }

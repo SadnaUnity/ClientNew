@@ -47,13 +47,18 @@ public class LoginScript : MonoBehaviour
             Debug.Log("Login success");
             SceneManager.LoadScene("Moving");
         }
-        else if(res.Item1 == 400)
+        else
         {
             PlayerDTO playerDto = JsonConvert.DeserializeObject<PlayerDTO>(res.Item2);
             errorText.text = playerDto.message;
+            ClearFields();
         }
     }
-    
+    private void ClearFields()
+    {
+        username.text = "";
+        password.text = "";
+    }
     public void ClickedBack(){ 
         SceneManager.LoadScene("First");
     }
