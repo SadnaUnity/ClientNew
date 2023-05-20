@@ -22,7 +22,7 @@ public class RegisterScript : MonoBehaviour
         AvatarImage();        
     }
 
-    public void ClickedBtn()
+    public void ClickedNext()
     {
         if (usernameTF.text == "")
         {
@@ -69,6 +69,11 @@ public class RegisterScript : MonoBehaviour
         }
     }
 
+    public void ClickedBack()
+    {
+        SceneManager.LoadScene("ChooseAccessory");
+    }
+
     private void ClearFields()
     {
         usernameTF.text = "";
@@ -76,7 +81,6 @@ public class RegisterScript : MonoBehaviour
         confirmPasswordTF.text = "";
     }
     
-
     private void AvatarImage()
     {
         color = (AvatarColor)PlayerPrefs.GetInt("avatarColor");
