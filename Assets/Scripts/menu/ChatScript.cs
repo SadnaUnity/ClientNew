@@ -30,6 +30,9 @@ public class ChatScript : MonoBehaviour
         clientWebSocket = new ClientWebSocket();
         Uri serverUri = new Uri($"ws://{ipAddress}:{port}/chat");
 
+        TMP_Text newMsg = Instantiate(textObject, chatPanel.transform);
+        newMsg.text = "Welcome to Chat!";
+        
         try
         {
             var token = new CancellationToken();
@@ -98,8 +101,6 @@ public class ChatScript : MonoBehaviour
             await clientWebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
 
             msgIf.text = "";
-
-            //AddMessageToChat(message);
         }
     }
     

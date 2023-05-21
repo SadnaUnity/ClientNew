@@ -17,7 +17,7 @@ public class HallScript : MonoBehaviour
     private Dictionary<int, string> roomsForHall;
     private GameObject curPlayer;
     private Player playerData;
-
+    private Dictionary<int, RoomStatus> roomStatuses;
 
     [SerializeField] private GameObject movingController;
     // Start is called before the first frame update
@@ -35,11 +35,37 @@ public class HallScript : MonoBehaviour
         // Set the sorting layer of the background object to a lower value
         backroundspriteRenderer.sortingLayerName = "Background";
         backroundspriteRenderer.sortingOrder = -1;
+        
         httpRequest = new HttpRequest();
+        GetHall();
         
         MovingScript movingScript = movingController.GetComponent<MovingScript>();
         curPlayer = movingScript.GetCurPlayer();
-        getDoors();
+        GetDoors();
+    }
+
+    private void GetHall()
+    {
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        var res = httpRequest.SendDataToServer(queryParams, "", "/hall", "GET");
+        if (res.Item1 == 200)
+        {
+            roomStatuses = new Dictionary<int, RoomStatus>();
+            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
+            foreach (RoomStatusDTO roomStatusDto in roomsDto.roomStatuses)
+            {
+                roomStatuses.Add(roomStatusDto.roomId, new RoomStatus(roomStatusDto));
+            }
+
+            roomStatuses[5].SetRoomMemberStatus(RoomMemberStatus.MEMBER);
+        }
+        else
+        {
+            Debug.Log("error in GetHall()");
+        }
     }
 
     // Update is called once per frame
@@ -89,7 +115,6 @@ public class HallScript : MonoBehaviour
             enteredARoom = true;
             room = keys[4];
         }
-       
         //check if entered door5
         else if (Vector3.Distance(curPlayer.transform.position,doorPositions[5])< 100f)
         {
@@ -99,13 +124,8 @@ public class HallScript : MonoBehaviour
 
         if (enteredARoom)
         {
-            List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
-            {
-                new("roomId", room),
-                new("userId", playerData.GetUserId())
-            };
-            var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
-            if (res.Item1 == 200)
+            
+            if (IsRoomMember(room))
             {
                 PlayerDataManager.PlayerData.SetRoomId(room);
                 SceneManager.LoadScene("Room");
@@ -118,7 +138,18 @@ public class HallScript : MonoBehaviour
             
         }
     }
-    private void getDoors()
+
+    private bool IsRoomMember(int roomId)
+    {
+        if (roomStatuses[roomId].GetRoomMemberStatus() == RoomMemberStatus.MEMBER)
+            return true;
+        else
+        {
+            return false;
+        }
+    }
+
+    private void GetDoors()
     {
         //set doors positions
         doorPositions = new Vector3[]

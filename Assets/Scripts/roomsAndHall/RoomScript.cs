@@ -38,7 +38,7 @@ public class RoomScript : MonoBehaviour
             new("roomId", playerData.GetRoomId()),
             new("userId", playerData.GetUserId())
         };
-        var res = httpRequest.SendDataToServer(queryParams, "", "/room/" + playerData.GetRoomId().ToString(), "GET");
+        var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST"); 
         if (res.Item1 == 200)
         {
             RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
