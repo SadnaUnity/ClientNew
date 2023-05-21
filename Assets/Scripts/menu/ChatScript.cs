@@ -30,10 +30,13 @@ public class ChatScript : MonoBehaviour
         clientWebSocket = new ClientWebSocket();
         Uri serverUri = new Uri($"ws://{ipAddress}:{port}/chat");
 
+        TMP_Text newMsg = Instantiate(textObject, chatPanel.transform);
+        newMsg.text = "Welcome to Chat!";
+        
         try
         {
             var token = new CancellationToken();
-            clientWebSocket.Options.SetRequestHeader("userID", "1");
+            clientWebSocket.Options.SetRequestHeader("userID", PlayerDataManager.PlayerData.GetUserId().ToString());
             await clientWebSocket.ConnectAsync(serverUri, token);
             Debug.Log("Connected to server");
         }

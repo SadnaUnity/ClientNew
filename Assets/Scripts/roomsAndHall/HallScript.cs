@@ -17,7 +17,7 @@ public class HallScript : MonoBehaviour
     private Dictionary<int, string> roomsForHall;
     private GameObject curPlayer;
     private Player playerData;
-
+    private Dictionary<int, RoomStatus> roomStatuses;
 
     [SerializeField] private GameObject movingController;
     // Start is called before the first frame update
@@ -35,11 +35,37 @@ public class HallScript : MonoBehaviour
         // Set the sorting layer of the background object to a lower value
         backroundspriteRenderer.sortingLayerName = "Background";
         backroundspriteRenderer.sortingOrder = -1;
+        
         httpRequest = new HttpRequest();
+        GetHall();
         
         MovingScript movingScript = movingController.GetComponent<MovingScript>();
         curPlayer = movingScript.GetCurPlayer();
-        getDoors();
+        GetDoors();
+    }
+
+    private void GetHall()
+    {
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        var res = httpRequest.SendDataToServer(queryParams, "", "/hall", "GET");
+        if (res.Item1 == 200)
+        {
+            roomStatuses = new Dictionary<int, RoomStatus>();
+            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
+            foreach (RoomStatusDTO roomStatusDto in roomsDto.roomStatuses)
+            {
+                roomStatuses.Add(roomStatusDto.roomId, new RoomStatus(roomStatusDto));
+            }
+
+            roomStatuses[5].SetRoomMemberStatus(RoomMemberStatus.MEMBER);
+        }
+        else
+        {
+            Debug.Log("error in GetHall()");
+        }
     }
 
     // Update is called once per frame
@@ -59,39 +85,38 @@ public class HallScript : MonoBehaviour
             SceneManager.LoadScene("Moving");
         }
         //check if entered door0
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[0])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[0])< 100f)
         {
             enteredARoom = true;
             room = keys[0];
 
         }
         //check if entered door1
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[1])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[1])< 100f)
         {
             enteredARoom = true;
             room = keys[1];
         }
         //check if entered door2
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[2])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[2])< 100f)
         {
             enteredARoom = true;
             room = keys[2];
         }
         //check if entered door3
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[3])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[3])< 100f)
         {
             enteredARoom = true;
             room = keys[3];
         }
         //check if entered door4
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[4])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[4])< 100f)
         {
             enteredARoom = true;
             room = keys[4];
         }
-       
         //check if entered door5
-        if (Vector3.Distance(curPlayer.transform.position,doorPositions[5])< 100f)
+        else if (Vector3.Distance(curPlayer.transform.position,doorPositions[5])< 100f)
         {
             enteredARoom = true;
             room = keys[5];
@@ -99,12 +124,32 @@ public class HallScript : MonoBehaviour
 
         if (enteredARoom)
         {
-           
-            PlayerDataManager.PlayerData.SetRoomId(room);
-            SceneManager.LoadScene("Room");
+            
+            if (IsRoomMember(room))
+            {
+                PlayerDataManager.PlayerData.SetRoomId(room);
+                SceneManager.LoadScene("Room");
+            }
+            else
+            {
+                Debug.Log("user is not a room member!");
+                //TODO: give msg to player in UI that he cant enter the room
+            }
+            
         }
     }
-    private void getDoors()
+
+    private bool IsRoomMember(int roomId)
+    {
+        if (roomStatuses[roomId].GetRoomMemberStatus() == RoomMemberStatus.MEMBER)
+            return true;
+        else
+        {
+            return false;
+        }
+    }
+
+    private void GetDoors()
     {
         //set doors positions
         doorPositions = new Vector3[]
