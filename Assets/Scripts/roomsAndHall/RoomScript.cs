@@ -47,7 +47,6 @@ public class RoomScript : MonoBehaviour
             {
                 // Load the image from the URL and set it as the sprite for the SpriteRenderer
                 StartCoroutine(LoadImageFromURL(posterDto.fileUrl,new Vector3(posterDto.position.x, posterDto.position.y, 0)));
-                               
             } 
         }
         else
