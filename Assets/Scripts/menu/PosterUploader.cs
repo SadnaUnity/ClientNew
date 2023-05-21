@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using Newtonsoft.Json;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -18,6 +19,7 @@ public class PosterUploader : MonoBehaviour
     [SerializeField] private Button choosePosterPositionBtn;
     [SerializeField] private Button lockPosterPositionBtn;
     [SerializeField] private Button sendPosterBtn;
+    [SerializeField] private RoomScript roomScript;
     
     private HttpRequest httpRequest;
     private GameObject poster;
@@ -68,7 +70,6 @@ public class PosterUploader : MonoBehaviour
                 break;
         }
     }
-
     public void UploadPoster()
     {
         // Show file dialog to choose an image file
@@ -95,7 +96,6 @@ public class PosterUploader : MonoBehaviour
         }
         ChangeInteractable(2);
     }
-
     public void ChoosePosterPosition()
     {
         // Get the position handler script on the poster game object
@@ -110,7 +110,6 @@ public class PosterUploader : MonoBehaviour
         imgPositionHandler.enabled = false;
         ChangeInteractable(4);
     }
-
     public void SendPoster()
     {
         Vector2 posterPos = poster.transform.position;
@@ -126,9 +125,12 @@ public class PosterUploader : MonoBehaviour
         };
         posterNameIf.text = "";
         var res = httpRequest.SendDataToServer(queryParams, "file", posterImgFile, "/poster");
+        if (res.Item1 != 200)
+        {
+            Debug.Log("Error uploading poster!");
+        }
         ChangeInteractable(1);
     }
-
     private Texture2D LoadTextureFromFile(string filePath)
     {
         Texture2D texture = null;
@@ -141,6 +143,28 @@ public class PosterUploader : MonoBehaviour
         }
 
         return texture;
+    }
+    public void DeletePoster()
+    {
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("roomId", playerData.GetRoomId()),
+            new("userId", playerData.GetUserId())
+        };
+        var res = httpRequest.SendDataToServer(queryParams, "", $"$/room/{playerData.GetRoomId()}", "POST"); 
+        if (res.Item1 == 200)
+        {
+            RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
+            List<Poster> posters = new List<Poster>();
+            foreach (PosterDTO posterDto in roomDataDto.room.posters)
+            {
+                posters.Add(new Poster(posterDto));
+            }
+        }
+        else
+        {
+            Debug.Log("Error get room id: " + playerData.GetRoomId());
+        }
     }
 }
 public class ImagePositionHandler : MonoBehaviour, IDragHandler
