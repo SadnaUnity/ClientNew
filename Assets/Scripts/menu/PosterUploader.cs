@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
@@ -7,9 +8,12 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
+using Toggle = UnityEngine.UI.Toggle;
 
 public class PosterUploader : MonoBehaviour
 {
@@ -19,19 +23,26 @@ public class PosterUploader : MonoBehaviour
     [SerializeField] private Button choosePosterPositionBtn;
     [SerializeField] private Button lockPosterPositionBtn;
     [SerializeField] private Button sendPosterBtn;
-    [SerializeField] private RoomScript roomScript;
+    [SerializeField] private GameObject toggleGroup;
+    [SerializeField] private Toggle togglePrefab;
     
+    private Toggle activeToggle;
     private HttpRequest httpRequest;
-    private GameObject poster;
+    private GameObject tmpPoster;
     private ImagePositionHandler imgPositionHandler;
     private byte[] posterImgFile;
     private Player playerData;
-    
+    private Dictionary<int, GameObject> posterIdToGameObject;
+    private Dictionary<int, string> posterIdToPosterName;
+
     public void Start()
     {
         ChangeInteractable(1);
         httpRequest = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
+        posterIdToGameObject = new Dictionary<int, GameObject>();
+        posterIdToPosterName = new Dictionary<int, string>();
+        GetRoomPosters();
     }
 
     private void ChangeInteractable(int i)
@@ -85,12 +96,12 @@ public class PosterUploader : MonoBehaviour
 
             if (texture != null)
             {
-                poster = new GameObject("poster");
-                poster.transform.SetParent(canvas.transform);
+                tmpPoster = new GameObject();
+                tmpPoster.transform.SetParent(canvas.transform);
                 Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                Image img = poster.AddComponent<Image>();
+                Image img = tmpPoster.AddComponent<Image>();
                 img.sprite = sprite;
-                poster.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+                tmpPoster.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
                 posterImgFile = bytes;
             }
         }
@@ -99,7 +110,7 @@ public class PosterUploader : MonoBehaviour
     public void ChoosePosterPosition()
     {
         // Get the position handler script on the poster game object
-        imgPositionHandler = poster.AddComponent<ImagePositionHandler>();
+        imgPositionHandler = tmpPoster.AddComponent<ImagePositionHandler>();
 
         // Enable the position handler script
         imgPositionHandler.enabled = true;
@@ -112,7 +123,7 @@ public class PosterUploader : MonoBehaviour
     }
     public void SendPoster()
     {
-        Vector2 posterPos = poster.transform.position;
+        Vector2 posterPos = tmpPoster.transform.position;
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("posterName", posterNameIf.text),
@@ -120,16 +131,22 @@ public class PosterUploader : MonoBehaviour
             new("yPos", posterPos.y),
             new("roomId", playerData.GetRoomId()),
             new("userId", playerData.GetUserId()),
-           
-            
         };
-        posterNameIf.text = "";
         var res = httpRequest.SendDataToServer(queryParams, "file", posterImgFile, "/poster");
-        if (res.Item1 != 200)
+        if (res.Item1 == 200)
+        {
+            PosterDataDTO posterDataDto = JsonConvert.DeserializeObject<PosterDataDTO>(res.Item2);
+            tmpPoster.name = posterDataDto.poster.posterName;
+            posterIdToGameObject.Add(posterDataDto.posterId, tmpPoster);
+            posterIdToPosterName.Add(posterDataDto.posterId, posterDataDto.poster.posterName);
+            posterNameIf.text = "";
+            ChangeInteractable(1);
+        }
+        else
         {
             Debug.Log("Error uploading poster!");
         }
-        ChangeInteractable(1);
+        
     }
     private Texture2D LoadTextureFromFile(string filePath)
     {
@@ -144,28 +161,109 @@ public class PosterUploader : MonoBehaviour
 
         return texture;
     }
+    public void ChoosePosterToDelete()
+    {
+        List<Toggle> instantiatedToggles = new List<Toggle>();
+        RectTransform toggleGroupRect = toggleGroup.GetComponent<RectTransform>();
+
+        float buttonHeight = togglePrefab.GetComponent<RectTransform>().rect.height;
+        float spacing = 10f; // Adjust the vertical spacing between buttons
+        int count = 0;
+        foreach (int key in posterIdToPosterName.Keys)
+        {
+            Toggle instantiatedToggle = Instantiate(togglePrefab, toggleGroup.transform);
+            instantiatedToggle.transform.SetParent(toggleGroup.transform, false);
+            instantiatedToggle.onValueChanged.AddListener(OnToggleValueChanged);
+            Text toggleText = instantiatedToggle.GetComponentInChildren<Text>();
+            toggleText.text = posterIdToPosterName[key];
+            instantiatedToggle.isOn = false; // Set isOn property to false initially
+            instantiatedToggles.Add(instantiatedToggle);
+
+            RectTransform toggleRect = instantiatedToggle.GetComponent<RectTransform>();
+            toggleRect.anchorMin = new Vector2(0f, 1f); // Set the anchor to top-left corner
+            toggleRect.anchorMax = new Vector2(0f, 1f); // Set the anchor to top-left corner
+            toggleRect.pivot = new Vector2(0f, 1f); // Set the pivot to top-left corner
+            toggleRect.anchoredPosition = new Vector2(0f, -count * (buttonHeight + spacing));
+            count++;
+            toggleRect.sizeDelta = new Vector2(toggleRect.sizeDelta.x, buttonHeight);
+        }
+    }
+
+    private void OnToggleValueChanged(bool isOn)
+    {
+        Toggle clickedToggle = EventSystem.current.currentSelectedGameObject.GetComponent<Toggle>();
+
+        if (isOn)
+        {
+            foreach (Toggle toggle in toggleGroup.GetComponentsInChildren<Toggle>())
+            {
+                if (toggle != clickedToggle)
+                {
+                    toggle.isOn = false;
+                }
+            }
+        }
+    }
+
+
+
+
+
     public void DeletePoster()
+    {
+        
+    }
+
+    private void GetRoomPosters()
     {
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("roomId", playerData.GetRoomId()),
             new("userId", playerData.GetUserId())
         };
-        var res = httpRequest.SendDataToServer(queryParams, "", $"$/room/{playerData.GetRoomId()}", "POST"); 
+        string rsc = $"/room/{playerData.GetRoomId()}";
+        var res = httpRequest.SendDataToServer(queryParams, "", rsc, "GET"); 
         if (res.Item1 == 200)
         {
             RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
-            List<Poster> posters = new List<Poster>();
-            foreach (PosterDTO posterDto in roomDataDto.room.posters)
+            List<PosterDTO> postersDto = roomDataDto.room.posters;
+            foreach (var posterDto in postersDto)
             {
-                posters.Add(new Poster(posterDto));
-            }
+                // Load the image from the URL and set it as the sprite for the SpriteRenderer
+                StartCoroutine(LoadImageFromURL(posterDto.fileUrl,new Vector3(posterDto.position.x, posterDto.position.y, 0), posterDto));
+            } 
         }
         else
         {
             Debug.Log("Error get room id: " + playerData.GetRoomId());
         }
     }
+    IEnumerator LoadImageFromURL(string url, Vector3 position, PosterDTO posterDto)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Failed to load image from URL: " + request.error);
+            yield break;
+        }
+
+        Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+
+        GameObject poster = new GameObject(posterDto.posterId.ToString());
+        poster.transform.position = position;
+        poster.transform.localScale = new Vector3(20f, 20f, 20f);
+        SpriteRenderer spriteRenderer = poster.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        
+        posterIdToGameObject.Add(posterDto.posterId, poster);
+        posterIdToPosterName.Add(posterDto.posterId, posterDto.posterName);
+        
+    }
+
 }
 public class ImagePositionHandler : MonoBehaviour, IDragHandler
 {
