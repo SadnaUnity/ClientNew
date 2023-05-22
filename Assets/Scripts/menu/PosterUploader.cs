@@ -27,6 +27,7 @@ public class PosterUploader : MonoBehaviour
     [SerializeField] private Toggle togglePrefab;
     
     private Toggle activeToggle;
+    private Dictionary<Toggle, int> toggleToPosterId;
     private HttpRequest httpRequest;
     private GameObject tmpPoster;
     private ImagePositionHandler imgPositionHandler;
@@ -43,6 +44,7 @@ public class PosterUploader : MonoBehaviour
         posterIdToGameObject = new Dictionary<int, GameObject>();
         posterIdToPosterName = new Dictionary<int, string>();
         GetRoomPosters();
+        toggleToPosterId = new Dictionary<Toggle, int>();
     }
 
     private void ChangeInteractable(int i)
@@ -163,12 +165,10 @@ public class PosterUploader : MonoBehaviour
     }
     public void ChoosePosterToDelete()
     {
-        List<Toggle> instantiatedToggles = new List<Toggle>();
-        RectTransform toggleGroupRect = toggleGroup.GetComponent<RectTransform>();
-
         float buttonHeight = togglePrefab.GetComponent<RectTransform>().rect.height;
-        float spacing = 10f; // Adjust the vertical spacing between buttons
+        float spacing = 5f; // Adjust the vertical spacing between buttons
         int count = 0;
+    
         foreach (int key in posterIdToPosterName.Keys)
         {
             Toggle instantiatedToggle = Instantiate(togglePrefab, toggleGroup.transform);
@@ -177,7 +177,7 @@ public class PosterUploader : MonoBehaviour
             Text toggleText = instantiatedToggle.GetComponentInChildren<Text>();
             toggleText.text = posterIdToPosterName[key];
             instantiatedToggle.isOn = false; // Set isOn property to false initially
-            instantiatedToggles.Add(instantiatedToggle);
+            toggleToPosterId.Add(instantiatedToggle, key); // Modify dictionary entry
 
             RectTransform toggleRect = instantiatedToggle.GetComponent<RectTransform>();
             toggleRect.anchorMin = new Vector2(0f, 1f); // Set the anchor to top-left corner
@@ -188,6 +188,7 @@ public class PosterUploader : MonoBehaviour
             toggleRect.sizeDelta = new Vector2(toggleRect.sizeDelta.x, buttonHeight);
         }
     }
+
 
     private void OnToggleValueChanged(bool isOn)
     {
@@ -204,15 +205,66 @@ public class PosterUploader : MonoBehaviour
             }
         }
     }
-
-
-
-
-
+    
     public void DeletePoster()
     {
-        
+        int selectedPosterId = -1;
+        foreach (Toggle toggle in toggleToPosterId.Keys)
+        {
+            if (toggle.isOn)
+            { 
+                selectedPosterId = toggleToPosterId[toggle];
+                List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+                {
+                    new("userId", PlayerDataManager.PlayerData.GetUserId())
+                };
+                var res = httpRequest.SendDataToServer(queryParams, "", $"/deletePoster/{selectedPosterId}", "POST");
+                if (res.Item1 == 200)
+                {
+                    Debug.Log("Poster was deleted successfully");
+                }
+                else if (res.Item1 == 401)
+                {
+                    Debug.Log("User is not allowed to delete poster!");
+                }
+                else
+                {
+                    Debug.Log("Error deleting poster!");
+                }
+                break;
+            }
+        }
+        DeletePosterFromRoom(selectedPosterId);
+        DestroyAllToggles();
     }
+
+    private void DestroyAllToggles()
+    {
+        foreach (Toggle toggle in toggleToPosterId.Keys)
+        {
+            Destroy(toggle.gameObject);
+        }
+        toggleToPosterId.Clear();
+    }
+
+
+    private void DeletePosterFromRoom(int selectedPosterId)
+    {
+        GameObject posterGoToDelete = posterIdToGameObject[selectedPosterId];
+    
+        // Check if the GameObject exists
+        if (posterGoToDelete != null)
+        {
+            // Destroy the GameObject
+            Destroy(posterGoToDelete);
+        
+            // Remove the entry from the dictionary
+            posterIdToGameObject.Remove(selectedPosterId);
+            posterIdToPosterName.Remove(selectedPosterId);
+        }
+    }
+
+
 
     private void GetRoomPosters()
     {
