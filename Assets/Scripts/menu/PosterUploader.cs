@@ -25,6 +25,7 @@ public class PosterUploader : MonoBehaviour
     [SerializeField] private Button sendPosterBtn;
     [SerializeField] private GameObject toggleGroup;
     [SerializeField] private Toggle togglePrefab;
+    [SerializeField] private TMP_Text errorDeleteMsg;
     
     private Toggle activeToggle;
     private Dictionary<Toggle, int> toggleToPosterId;
@@ -165,6 +166,7 @@ public class PosterUploader : MonoBehaviour
     }
     public void ChoosePosterToDelete()
     {
+        errorDeleteMsg.text = "";
         float buttonHeight = togglePrefab.GetComponent<RectTransform>().rect.height;
         float spacing = 5f; // Adjust the vertical spacing between buttons
         int count = 0;
@@ -225,7 +227,9 @@ public class PosterUploader : MonoBehaviour
                 }
                 else if (res.Item1 == 401)
                 {
-                    Debug.Log("User is not allowed to delete poster!");
+                    string msg = "User is not allowed to delete poster!";
+                    Debug.Log(msg);
+                    errorDeleteMsg.text = msg;
                 }
                 else
                 {
@@ -263,9 +267,6 @@ public class PosterUploader : MonoBehaviour
             posterIdToPosterName.Remove(selectedPosterId);
         }
     }
-
-
-
     private void GetRoomPosters()
     {
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
