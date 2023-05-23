@@ -8,12 +8,14 @@
 
         public RoomRequests(RequstesDTO requstesDto)
         {
-            joinRoomRequests = new List<JoinRoomReq>();
-            foreach (var req in requstesDto.joinRoomRequests)
+            if (requstesDto != null)
             {
-                joinRoomRequests.Add(new JoinRoomReq(req));
+                joinRoomRequests = new List<JoinRoomReq>();
+                foreach (var req in requstesDto.joinRoomRequests)
+                {
+                    joinRoomRequests.Add(new JoinRoomReq(req));
+                }
             }
-            
         }
 
         public  List<JoinRoomReq> GetJoinRoonmReq()

@@ -25,7 +25,6 @@ public class NotificationsScript : MonoBehaviour
     {
         httpRequest = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
-
     }
 
     // Update is called once per frame
@@ -47,7 +46,7 @@ public class NotificationsScript : MonoBehaviour
             int y = 0;
             RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res.Item2);
             roomRequests = new RoomRequests(requstesDto);
-            popUpWindow.SetActive(true);
+            
             for (int i = 0; i < requstesDto.joinRoomRequests.Count; i++)
             {
                 var requst = requstesDto.joinRoomRequests[i];
