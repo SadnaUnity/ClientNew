@@ -38,21 +38,12 @@ public class RoomScript : MonoBehaviour
             new("roomId", playerData.GetRoomId()),
             new("userId", playerData.GetUserId())
         };
-        var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST"); 
-        if (res.Item1 == 200)
-        {
-            RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
-            List<PosterDTO> postersDto = roomDataDto.room.posters;
-            foreach (var posterDto in postersDto)
-            {
-                // Load the image from the URL and set it as the sprite for the SpriteRenderer
-                StartCoroutine(LoadImageFromURL(posterDto.fileUrl,new Vector3(posterDto.position.x, posterDto.position.y, 0)));
-            } 
-        }
-        else
+        var res = httpRequest.SendDataToServer(queryParams, "", "/getIntoRoom", "POST");
+        if (res.Item1 != 200)
         {
             Debug.Log("Error get room id: " + playerData.GetRoomId());
         }
+
     }
 
     // Update is called once per frame
@@ -60,31 +51,6 @@ public class RoomScript : MonoBehaviour
     {
 
     }
-
-    IEnumerator LoadImageFromURL(string url, Vector3 position)
-    {
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        yield return request.SendWebRequest();
-
-        if (request.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError("Failed to load image from URL: " + request.error);
-            yield break;
-        }
-
-        Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-
-        GameObject poster = new GameObject();
-        poster.transform.position = position;
-        poster.transform.localScale = new Vector3(20f, 20f, 20f);
-        SpriteRenderer spriteRenderer = poster.AddComponent<SpriteRenderer>();
-        spriteRenderer.sprite = sprite;
-    }
-
-
-
 }
 
 

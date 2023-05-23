@@ -12,8 +12,8 @@ public class Menu : MonoBehaviour
     public void Start()
     {
         btnRectTransform = menuBtn.GetComponent<RectTransform>();
-        showMenu = false;
-        menuPanel.SetActive(false);
+        showMenu = true;
+        menuPanel.SetActive(showMenu);
     }
     public void ShowHideMenu()
     {
