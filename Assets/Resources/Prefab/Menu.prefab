@@ -631,9 +631,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   msgIf: {fileID: 3451200059009144496}
-  chatPanel: {fileID: 8487003494970686744}
-  textObject: {fileID: 8902948837327513295, guid: 738392215e597be45b7b2fe0c752a8e4, type: 3}
-  scrollView: {fileID: 6997775956172364012}
+  textObject: {fileID: 8601846485511850276, guid: 41945fc62feecca4ab7271e2e57b0888, type: 3}
+  scrollView: {fileID: 5457229538364521039}
 --- !u!1 &2045590346787571312
 GameObject:
   m_ObjectHideFlags: 0
