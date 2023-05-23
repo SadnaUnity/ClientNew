@@ -23,7 +23,7 @@ public class MovingScript : MonoBehaviour
     private GameObject curPlayer;
     private Dictionary<int, GameObject> playersById;
     private Dictionary<int, bool> playersOnScreen;
-
+    
     // Start is called before the first frame update
     void Start()
     {

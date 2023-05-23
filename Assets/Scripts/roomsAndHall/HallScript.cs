@@ -63,7 +63,7 @@ public class HallScript : MonoBehaviour
                 roomStatuses.Add(roomStatusDto.roomId, new RoomStatus(roomStatusDto));
             }
 
-            roomStatuses[5].SetRoomMemberStatus(RoomMemberStatus.MEMBER);
+            //roomStatuses[5].SetRoomMemberStatus(RoomMemberStatus.MEMBER);
         }
         else
         {
