@@ -18,6 +18,9 @@ public class HallScript : MonoBehaviour
     private GameObject curPlayer;
     private Player playerData;
     private Dictionary<int, RoomStatus> roomStatuses;
+    public popUpWindow popupWindow;
+    private int roomToJoin;
+
 
     [SerializeField] private GameObject movingController;
     // Start is called before the first frame update
@@ -131,11 +134,30 @@ public class HallScript : MonoBehaviour
                 SceneManager.LoadScene("Room");
             }
             else
-            {
-                Debug.Log("user is not a room member!");
-                //TODO: give msg to player in UI that he cant enter the room
+            { 
+                popupWindow.ShowPopup();
+                roomToJoin = room;
             }
             
+        }
+        
+    }
+
+    public void membershipBtn()
+    {
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        var res = httpRequest.SendDataToServer(queryParams, "", $"/joinRoom/{roomToJoin}","POST"); 
+        if (res.Item1 == 200)
+        {
+            Debug.Log("request was sent successfully");
+            popupWindow.HidePopup();
+        }
+        else
+        {
+            Debug.Log("request error");
         }
     }
 
@@ -185,7 +207,12 @@ public class HallScript : MonoBehaviour
 
         }
 
-    }
+       
 
+    }
+    public void closePopUp()
+    { 
+         popupWindow.HidePopup();
+    }
     
 }

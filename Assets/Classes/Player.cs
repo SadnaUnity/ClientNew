@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using Classes;
+using UnityEngine;
 
 public class Player
 {

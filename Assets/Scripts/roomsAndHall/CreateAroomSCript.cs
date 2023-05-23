@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -38,14 +39,20 @@ public class CreateAroomSCript : MonoBehaviour
         playerData = PlayerDataManager.PlayerData;
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
-            new("managerId", playerData.GetUserId()),
             new("roomName", RoomName.text),
-            //new("privacy", Private.isOn)
-
-
-            
         };
-        var res = httpRequest.SendDataToServer(queryParams, "", "/room", "POST");
+        List<KeyValuePair<string, object>> body = new List<KeyValuePair<string, object>>
+        {
+            new KeyValuePair<string, object>("managerId", playerData.GetUserId()),
+            new KeyValuePair<string, object>("privacy", Private.isOn),
+            new KeyValuePair<string, object>("description", "hi")
+
+        };
+
+        Dictionary<string, object> jsonBody = body.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        string bodyString = JsonConvert.SerializeObject(jsonBody, Formatting.Indented);
+        
+        var res = httpRequest.SendDataToServer(queryParams, bodyString, "/room", "POST");
         if (res.Item1 == 200)
         {
             RoomStatusDTO roomStatusDto = JsonConvert.DeserializeObject<RoomStatusDTO>(res.Item2);
