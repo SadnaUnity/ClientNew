@@ -15,26 +15,27 @@ public class ChatScript : MonoBehaviour
     private ClientWebSocket clientWebSocket;
 
     [SerializeField] private TMP_InputField msgIf;
-    private RectTransform chatContent;
     [SerializeField] private TMP_Text textObject;
     [SerializeField] private ScrollRect scrollView;
+    private RectTransform chatContent;
     private int msgCount;
     private List<TMP_Text> msgList;
     private bool isClosing = false;
     private float msgHeight;
+    private float msgWidth;
     public async void Start()
     {
-        scrollView.content.anchoredPosition = new Vector2(0, 325f);
         chatContent = scrollView.content;
-        msgHeight = textObject.GetComponent<RectTransform>().rect.height;
         msgCount = 0;
         msgList = new List<TMP_Text>();
 
         clientWebSocket = new ClientWebSocket();
         Uri serverUri = new Uri($"ws://{ipAddress}:{port}/chat");
-
         TMP_Text newMsg = Instantiate(textObject, chatContent.transform);
         newMsg.text = $"Chat Room {PlayerDataManager.PlayerData.GetRoomId()}!";
+        
+        msgList.Add(newMsg);
+        msgCount++;
 
         try
         {
@@ -49,6 +50,7 @@ public class ChatScript : MonoBehaviour
         }
 
         ReceiveMessages();
+
     }
 
     private async void ReceiveMessages()
@@ -83,15 +85,14 @@ public class ChatScript : MonoBehaviour
 
         msgList.Add(newMsg);
         msgCount++;
-
-        if (msgCount > 100)
+        if (msgCount > 50)
         {
             Destroy(msgList[0].gameObject);
             msgList.RemoveAt(0);
             msgCount--;
         }
 
-        scrollView.GetComponent<ScrollRect>().verticalNormalizedPosition = 0;
+        scrollView.GetComponent<ScrollRect>().verticalNormalizedPosition = 0f;
     }
 
     public async void SendMsg()
