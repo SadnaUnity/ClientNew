@@ -1,13 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using Microsoft.Unity.VisualStudio.Editor;
-using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
 public class RoomScript : MonoBehaviour
 {

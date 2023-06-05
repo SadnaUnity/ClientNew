@@ -86,14 +86,15 @@ public class PosterUploader : MonoBehaviour
     }
     public void UploadPoster()
     {
+        #if UNITY_EDITOR
         // Show file dialog to choose an image file
-        string[] extensions = { "jpg", "jpg", "png", "png" };
+        string[] extensions = { "jpg", "jpeg", "png" };
         string path = UnityEditor.EditorUtility.OpenFilePanelWithFilters("Choose an image file", "", extensions);
 
         if (!string.IsNullOrEmpty(path))
         {
             byte[] bytes = File.ReadAllBytes(path);
-            
+
             // Load the image from the path
             Texture2D texture = LoadTextureFromFile(path);
 
@@ -108,8 +109,11 @@ public class PosterUploader : MonoBehaviour
                 posterImgFile = bytes;
             }
         }
+        #endif
+
         ChangeInteractable(2);
     }
+
     public void ChoosePosterPosition()
     {
         // Get the position handler script on the poster game object
