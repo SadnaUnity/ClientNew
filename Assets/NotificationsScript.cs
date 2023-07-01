@@ -19,6 +19,7 @@ public class NotificationsScript : MonoBehaviour
     [SerializeField] private GameObject popUpWindow;
     [SerializeField] private TMP_Text textObject;
     private RoomRequests roomRequests;
+    private bool popUpIsOn = false;
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +37,16 @@ public class NotificationsScript : MonoBehaviour
 
     public void clickedBtn()
     {
-        popUpWindow.SetActive(true);
+        if (popUpIsOn)
+        {
+            popUpWindow.SetActive(false);
+            popUpIsOn = false;
+        }
+        else
+        {
+            popUpWindow.SetActive(true);
+            popUpIsOn = true;
+        }
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("managerId", playerData.GetUserId())
@@ -47,7 +57,6 @@ public class NotificationsScript : MonoBehaviour
             int y = 0;
             RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res.Item2);
             roomRequests = new RoomRequests(requstesDto);
-            popUpWindow.SetActive(true);
             for (int i = 0; i < requstesDto.joinRoomRequests.Count; i++)
             {
                 var requst = requstesDto.joinRoomRequests[i];
@@ -94,6 +103,7 @@ public class NotificationsScript : MonoBehaviour
         if (res.Item1 == 200)
         {
             Debug.Log("success");
+            clickedBtn();
         }
     }
 
