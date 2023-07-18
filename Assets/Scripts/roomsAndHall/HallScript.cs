@@ -20,7 +20,6 @@ public class HallScript : MonoBehaviour
     private Dictionary<int, RoomStatus> roomStatuses;
     public popUpWindow popupWindow;
     private int roomToJoin;
-    private bool isPopUp = false;
 
 
     [SerializeField] private GameObject movingController;
@@ -170,17 +169,17 @@ public class HallScript : MonoBehaviour
     private void GetIntoRoom(int room)
     {
         if (IsRoomMember(room))
-                {
-                    PlayerDataManager.PlayerData.SetRoomId(room);
-                    SceneManager.LoadScene("Room");
-                }
-                else
-                {
-                    SendPosition(curPlayer.transform.position);
-                       
-                    popupWindow.ShowPopup();
-                    roomToJoin = room;
-                }
+        {
+            PlayerDataManager.PlayerData.SetRoomId(room);
+            SceneManager.LoadScene("Room");
+        }
+        else
+        {
+            SendPosition(curPlayer.transform.position);
+               
+            popupWindow.ShowPopup();
+            roomToJoin = room;
+        }
     }
     
 
@@ -220,7 +219,6 @@ public class HallScript : MonoBehaviour
             new Vector3(1814, 528, 0), new Vector3(1527, 625, 0), new Vector3(1318, 625, 0), new Vector3(114, 568, 0),
             new Vector3(405, 629, 0), new Vector3(610, 645,0)
         };
-        
         
         //get all rooms
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>

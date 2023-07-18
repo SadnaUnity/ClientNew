@@ -16,6 +16,10 @@ private Dictionary<int, RoomStatus> roomsDic;
 
     }
 
+    public Dictionary<int, RoomStatus> GetAllRooms()
+    {
+        return roomsDic;
+    }
     public Dictionary<int, string> getRoomsForHall()
     {
         Dictionary<int, string> selectedRooms = new Dictionary<int, string>();
