@@ -20,6 +20,7 @@ public class HallScript : MonoBehaviour
     private Dictionary<int, RoomStatus> roomStatuses;
     public popUpWindow popupWindow;
     private int roomToJoin;
+    private bool isPopUp = false;
 
 
     [SerializeField] private GameObject movingController;
@@ -134,7 +135,9 @@ public class HallScript : MonoBehaviour
                 SceneManager.LoadScene("Room");
             }
             else
-            { 
+            {
+               SendPosition(curPlayer.transform.position);
+               
                 popupWindow.ShowPopup();
                 roomToJoin = room;
             }
@@ -142,6 +145,44 @@ public class HallScript : MonoBehaviour
         }
         
     }
+
+    public void Door0Btn()
+    {
+        GetIntoRoom(keys[0]);
+    }
+    public void Door1Btn()
+    {
+        GetIntoRoom(keys[1]);
+    }public void Door2Btn()
+    {
+        GetIntoRoom(keys[2]);
+    }public void Door3Btn()
+    {
+        GetIntoRoom(keys[3]);
+    }public void Door4Btn()
+    {
+        GetIntoRoom(keys[4]);
+    }
+    public void Door5Btn()
+    {
+        GetIntoRoom(keys[5]);
+    }
+    private void GetIntoRoom(int room)
+    {
+        if (IsRoomMember(room))
+                {
+                    PlayerDataManager.PlayerData.SetRoomId(room);
+                    SceneManager.LoadScene("Room");
+                }
+                else
+                {
+                    SendPosition(curPlayer.transform.position);
+                       
+                    popupWindow.ShowPopup();
+                    roomToJoin = room;
+                }
+    }
+    
 
     public void membershipBtn()
     {
@@ -214,5 +255,13 @@ public class HallScript : MonoBehaviour
     { 
          popupWindow.HidePopup();
     }
-    
+    private void SendPosition(Vector3 pos)
+    {
+        string jsonPos = JsonConvert.SerializeObject(new PositionDTO(pos.x + 100f, pos.y + 50f));
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        var res = httpRequest.SendDataToServer(queryParams, jsonPos, "/updatePosition", "POST");
+    }
 }

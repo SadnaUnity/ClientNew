@@ -765,7 +765,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   msgIf: {fileID: 3451200059009144496}
-  textObject: {fileID: 8601846485511850276, guid: 41945fc62feecca4ab7271e2e57b0888, type: 3}
+  textObject: {fileID: 8601846485511850276, guid: 41945fc62feecca4ab7271e2e57b0888,
+    type: 3}
   scrollView: {fileID: 5457229538364521039}
 --- !u!1 &2045590346787571312
 GameObject:
@@ -3867,7 +3868,8 @@ MonoBehaviour:
   lockPosterPositionBtn: {fileID: 5060234764222309895}
   sendPosterBtn: {fileID: 5060234764943746187}
   toggleGroup: {fileID: 8915112294027035602}
-  togglePrefab: {fileID: 1419511170135447214, guid: 13b7c2d9514a9084d8a77cff0311bb13, type: 3}
+  togglePrefab: {fileID: 1419511170135447214, guid: 13b7c2d9514a9084d8a77cff0311bb13,
+    type: 3}
   errorDeleteMsg: {fileID: 8690570484673085869}
 --- !u!1 &5060234765510774444
 GameObject:
@@ -6477,4 +6479,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   popUpWindow: {fileID: 0}
-  textObject: {fileID: 8902948837327513295, guid: f150418e5e6834858b4e9dabb32c8fc2, type: 3}
+  textObject: {fileID: 8902948837327513295, guid: f150418e5e6834858b4e9dabb32c8fc2,
+    type: 3}
