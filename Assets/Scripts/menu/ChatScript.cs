@@ -15,24 +15,27 @@ public class ChatScript : MonoBehaviour
     private ClientWebSocket clientWebSocket;
 
     [SerializeField] private TMP_InputField msgIf;
-    [SerializeField] private GameObject chatPanel;
+    private RectTransform chatContent;
     [SerializeField] private TMP_Text textObject;
-    [SerializeField] private GameObject scrollView;
+    [SerializeField] private ScrollRect scrollView;
     private int msgCount;
     private List<TMP_Text> msgList;
     private bool isClosing = false;
-    
+    private float msgHeight;
     public async void Start()
     {
+        scrollView.content.anchoredPosition = new Vector2(0, 325f);
+        chatContent = scrollView.content;
+        msgHeight = textObject.GetComponent<RectTransform>().rect.height;
         msgCount = 0;
         msgList = new List<TMP_Text>();
 
         clientWebSocket = new ClientWebSocket();
         Uri serverUri = new Uri($"ws://{ipAddress}:{port}/chat");
 
-        TMP_Text newMsg = Instantiate(textObject, chatPanel.transform);
-        newMsg.text = "Welcome to Chat!";
-        
+        TMP_Text newMsg = Instantiate(textObject, chatContent.transform);
+        newMsg.text = $"Chat Room {PlayerDataManager.PlayerData.GetRoomId()}!";
+
         try
         {
             var token = new CancellationToken();
@@ -75,7 +78,7 @@ public class ChatScript : MonoBehaviour
 
     private void AddMessageToChat(string message)
     {
-        TMP_Text newMsg = Instantiate(textObject, chatPanel.transform);
+        TMP_Text newMsg = Instantiate(textObject, chatContent.transform);
         newMsg.text = message;
 
         msgList.Add(newMsg);

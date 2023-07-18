@@ -4,13 +4,17 @@ namespace Classes
     {
         private int userId;
         private int roomId; 
-       // private string requestStatus;
+        private string username;
+
+        //private string requestStatus;
 
         public JoinRoomReq(JoinRoomReqDTO joinRoomReqDto)
         {
             this.userId = joinRoomReqDto.userId;
             this.roomId = joinRoomReqDto.roomId;
-           // this.requestStatus = joinRoomReqDto.requestStatus;
+            this.username = joinRoomReqDto.username;
+
+          //  this.requestStatus = joinRoomReqDto.requestStatus;
         }
 
         public int GetUserId()

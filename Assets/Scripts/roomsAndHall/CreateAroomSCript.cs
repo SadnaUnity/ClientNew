@@ -57,8 +57,13 @@ public class CreateAroomSCript : MonoBehaviour
         {
             RoomStatusDTO roomStatusDto = JsonConvert.DeserializeObject<RoomStatusDTO>(res.Item2);
             PlayerDataManager.PlayerData.SetRoomId(roomStatusDto.roomId);
-            SceneManager.LoadScene("Room");
-
+            httpRequest = new HttpRequest();
+            List<KeyValuePair<string, object>> queryPar = new List<KeyValuePair<string, object>>
+            {
+                new("userId", playerData.GetUserId())
+            };
+            httpRequest.SendDataToServer(queryPar, "", "/getOutFromRoom", "POST");
+            SceneManager.LoadScene("Moving");
         }
         else
         {
@@ -66,5 +71,16 @@ public class CreateAroomSCript : MonoBehaviour
         }
 
     }
+
+    public void clickedBackBtn()
+    {
+        httpRequest = new HttpRequest();
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        httpRequest.SendDataToServer(queryParams, "", "/getOutFromRoom", "POST");
+        SceneManager.LoadScene("Moving");    }
+    
     
 }

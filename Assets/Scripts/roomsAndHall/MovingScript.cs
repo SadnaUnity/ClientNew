@@ -23,7 +23,8 @@ public class MovingScript : MonoBehaviour
     private GameObject curPlayer;
     private Dictionary<int, GameObject> playersById;
     private Dictionary<int, bool> playersOnScreen;
-
+    private float avatarSize = 4.25f;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -50,7 +51,7 @@ public class MovingScript : MonoBehaviour
         // Assign the sprite to the SpriteRenderer component and load img
         spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(playerData.GetAvatar()));
 
-        spriteRenderer.transform.localScale = new Vector3(3f, 3f, 3f);
+        spriteRenderer.transform.localScale = new Vector3(avatarSize, avatarSize, avatarSize);
 
         curPlayer.transform.position = new Vector3(957, 90, 0);  
         spriteRenderer.sortingOrder = 1;
@@ -206,7 +207,7 @@ public class MovingScript : MonoBehaviour
         // Assign the sprite to the SpriteRenderer component and load img
         spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(avatarPosition.Item1));
 
-        spriteRenderer.transform.localScale = new Vector3(3f, 3f, 3f);
+        spriteRenderer.transform.localScale = new Vector3(avatarSize, avatarSize, avatarSize);
         
         character.transform.position = new Vector3(avatarPosition.Item2.GetX(), avatarPosition.Item2.GetY());
         
