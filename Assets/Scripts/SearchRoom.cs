@@ -26,7 +26,7 @@ public class SearchRoom : MonoBehaviour
             Dictionary<int, RoomStatus> allRooms = new Rooms(roomsDto).GetAllRooms();
             string roomName = roomInputField.text;
             roomInputField.text = "";
-            int roomId = GetRoomIdIfExists(roomName);
+            //int roomId = GetRoomIdIfExists(roomName);
 
         }
     }

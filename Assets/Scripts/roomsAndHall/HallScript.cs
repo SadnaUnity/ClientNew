@@ -135,8 +135,11 @@ public class HallScript : MonoBehaviour
             }
             else
             {
-               SendPosition(curPlayer.transform.position);
-               
+                Vector3 pos = new Vector3(956f, 185f, 0);
+                curPlayer.transform.position = pos;
+                MovingScript movingScript = movingController.GetComponent<MovingScript>();
+                movingScript.SetMousePosition(pos);
+                SendPosition(pos);
                 popupWindow.ShowPopup();
                 roomToJoin = room;
             }
@@ -175,8 +178,8 @@ public class HallScript : MonoBehaviour
         }
         else
         {
+            curPlayer.transform.position = new Vector3(956f, 185f, 0);
             SendPosition(curPlayer.transform.position);
-               
             popupWindow.ShowPopup();
             roomToJoin = room;
         }

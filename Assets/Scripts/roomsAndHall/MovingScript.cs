@@ -90,7 +90,11 @@ public class MovingScript : MonoBehaviour
         curPlayer.transform.position = Vector3.MoveTowards(curPlayer.transform.position, mousePosition, speed * Time.deltaTime);
 
     }
-    
+
+    public void SetMousePosition(Vector3 pos)
+    {
+        mousePosition = new Vector3(pos.x, pos.y, pos.z);
+    }
     void LateUpdate()
     {
         // Update the camera's position to follow the curPlayerTransform
