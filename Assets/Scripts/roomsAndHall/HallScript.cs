@@ -155,13 +155,16 @@ public class HallScript : MonoBehaviour
     public void Door1Btn()
     {
         GetIntoRoom(keys[1]);
-    }public void Door2Btn()
+    }
+    public void Door2Btn()
     {
         GetIntoRoom(keys[2]);
-    }public void Door3Btn()
+    }
+    public void Door3Btn()
     {
         GetIntoRoom(keys[3]);
-    }public void Door4Btn()
+    }
+    public void Door4Btn()
     {
         GetIntoRoom(keys[4]);
     }
@@ -169,7 +172,7 @@ public class HallScript : MonoBehaviour
     {
         GetIntoRoom(keys[5]);
     }
-    private void GetIntoRoom(int room)
+    public void GetIntoRoom(int room)
     {
         if (IsRoomMember(room))
         {
