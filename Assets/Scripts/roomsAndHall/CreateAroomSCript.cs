@@ -23,7 +23,6 @@ public class CreateAroomSCript : MonoBehaviour
     {   
         httpRequest = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
-        int i = 0;
     }
 
     // Update is called once per frame

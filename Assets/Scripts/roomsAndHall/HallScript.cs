@@ -20,7 +20,6 @@ public class HallScript : MonoBehaviour
     private Dictionary<int, RoomStatus> roomStatuses;
     public popUpWindow popupWindow;
     private int roomToJoin;
-    private bool isPopUp = false;
 
 
     [SerializeField] private GameObject movingController;
@@ -136,8 +135,11 @@ public class HallScript : MonoBehaviour
             }
             else
             {
-               SendPosition(curPlayer.transform.position);
-               
+                Vector3 pos = new Vector3(956f, 185f, 0);
+                curPlayer.transform.position = pos;
+                MovingScript movingScript = movingController.GetComponent<MovingScript>();
+                movingScript.SetMousePosition(pos);
+                SendPosition(pos);
                 popupWindow.ShowPopup();
                 roomToJoin = room;
             }
@@ -170,17 +172,17 @@ public class HallScript : MonoBehaviour
     private void GetIntoRoom(int room)
     {
         if (IsRoomMember(room))
-                {
-                    PlayerDataManager.PlayerData.SetRoomId(room);
-                    SceneManager.LoadScene("Room");
-                }
-                else
-                {
-                    SendPosition(curPlayer.transform.position);
-                       
-                    popupWindow.ShowPopup();
-                    roomToJoin = room;
-                }
+        {
+            PlayerDataManager.PlayerData.SetRoomId(room);
+            SceneManager.LoadScene("Room");
+        }
+        else
+        {
+            curPlayer.transform.position = new Vector3(956f, 185f, 0);
+            SendPosition(curPlayer.transform.position);
+            popupWindow.ShowPopup();
+            roomToJoin = room;
+        }
     }
     
 
@@ -220,7 +222,6 @@ public class HallScript : MonoBehaviour
             new Vector3(1814, 528, 0), new Vector3(1527, 625, 0), new Vector3(1318, 625, 0), new Vector3(114, 568, 0),
             new Vector3(405, 629, 0), new Vector3(610, 645,0)
         };
-        
         
         //get all rooms
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
