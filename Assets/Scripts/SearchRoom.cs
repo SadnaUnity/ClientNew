@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -8,10 +9,17 @@ public class SearchRoom : MonoBehaviour
 {
     private HttpRequest httpRequest;
     private Player playerData;
-    [SerializeField] private TMP_Text errorTxt;
+    
     [SerializeField] private TMP_InputField roomInputField;
+    [SerializeField] private TMP_Text errorMsg;
+    [SerializeField] private GameObject hallController;
 
-    // Start is called before the first frame update
+    void Start()
+    {
+        playerData = PlayerDataManager.PlayerData;
+        httpRequest = new HttpRequest();
+    }
+
     public void EnterRoom()
     {
         //get all rooms
@@ -26,9 +34,34 @@ public class SearchRoom : MonoBehaviour
             Dictionary<int, RoomStatus> allRooms = new Rooms(roomsDto).GetAllRooms();
             string roomName = roomInputField.text;
             roomInputField.text = "";
-            //int roomId = GetRoomIdIfExists(roomName);
-
+            GetIntoRoomIfExists(roomName, allRooms);
         }
     }
+
+    private void GetIntoRoomIfExists(string roomName, Dictionary<int, RoomStatus> allRooms)
+    {
+        int roomId = FindRoomId(roomName, allRooms);
+        if (roomId != -1)
+        {
+            HallScript hallScript = hallController.GetComponent<HallScript>();
+            hallScript.GetIntoRoom(roomId);
+        }
+        else
+        {
+            errorMsg.text = "Room Does Not Exists!";
+        }
+    }
+
+    private int FindRoomId(string roomName, Dictionary<int, RoomStatus> allRooms)
+    {
+        foreach (int roomId in allRooms.Keys)
+        {
+            if (allRooms[roomId].GetRoomName().Equals(roomName))
+                return roomId;
+        }
+
+        return -1;
+    }
+    
 }
 
