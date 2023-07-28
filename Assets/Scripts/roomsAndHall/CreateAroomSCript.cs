@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,28 +11,29 @@ using UnityEngine.UI;
 public class CreateAroomSCript : MonoBehaviour
 {
     [SerializeField] private TMP_InputField RoomName;
-
-    [SerializeField] private TMP_Dropdown Capacity;
-
     [SerializeField] private Toggle Private;
-   
+    [SerializeField] private Image[] backgrounds;
+    
     private HttpRequest httpRequest;
     private Player playerData;
+    private int chosenBackIndex;
+    private float shadow;
     
     // Start is called before the first frame update
     void Start()
-    {   
+    {
+        shadow = 154f / 255f;
         httpRequest = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
+        foreach (var back in backgrounds)
+        {
+            back.color = new Color(shadow, shadow, shadow);
+        }
+        backgrounds[0].color = new Color(1, 1, 1);
+        chosenBackIndex = 0;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public void clickedBtn()
+    public void CreateARoomBtn()
     {
      
         httpRequest = new HttpRequest();
@@ -71,7 +73,11 @@ public class CreateAroomSCript : MonoBehaviour
 
     }
 
-    public void clickedBackBtn()
+    public void ChooseImgThemeBtn()
+    {
+        
+    }
+    public void ClickedBackBtn()
     {
         httpRequest = new HttpRequest();
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
@@ -79,7 +85,21 @@ public class CreateAroomSCript : MonoBehaviour
             new("userId", playerData.GetUserId())
         };
         httpRequest.SendDataToServer(queryParams, "", "/getOutFromRoom", "POST");
-        SceneManager.LoadScene("Moving");    }
-    
+        SceneManager.LoadScene("Moving");
+        
+    }
+    public void OnImageClick(int clickedIndex)
+    {
+        backgrounds[clickedIndex].color = new Color(1, 1, 1);
+        chosenBackIndex = clickedIndex;
+        
+        for (int i = 0; i < backgrounds.Length; i++)
+        {
+            if (i != clickedIndex)
+            {
+                backgrounds[i].color = new Color(shadow, shadow, shadow);;
+            }
+        }
+    }
     
 }
