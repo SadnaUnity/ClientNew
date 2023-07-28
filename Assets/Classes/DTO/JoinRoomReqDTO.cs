@@ -1,4 +1,5 @@
 using System;
+using Classes;
 
 [Serializable]
 
@@ -10,4 +11,13 @@ using System;
         public string username { set; get; }
 
         public JoinRoomReqDTO(){}
+
+        public JoinRoomReqDTO(JoinRoomReq joinRoomReq)
+        {
+            this.userId = joinRoomReq.GetUserId();
+            this.username = joinRoomReq.GetUsername();
+            this.requestStatus = joinRoomReq.GetStatus();
+            this.roomId = joinRoomReq.GetRoomID();
+        }
+
     }

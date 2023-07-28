@@ -24,7 +24,7 @@ public class Menu : MonoBehaviour
         showMenu = true;
         menuPanel.SetActive(showMenu);
         notification.SetActive(false);
-        InvokeRepeating("UnseenNotification", 0f, 60f);
+        InvokeRepeating("UnseenNotification", 0f, 4f);
 
     }
     public void ShowHideMenu()
