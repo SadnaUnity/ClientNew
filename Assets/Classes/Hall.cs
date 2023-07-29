@@ -1,14 +1,15 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Rooms
+public class Hall
 {
 private Dictionary<int, RoomStatus> roomsDic;
-    public Rooms(RoomsDTO roomsDTO)
+    public Hall(HallDTO hallDTO)
     {
         this.roomsDic = new Dictionary<int, RoomStatus>();
-        foreach (var roomStatusDTO in roomsDTO.roomStatuses)
+        foreach (var roomStatusDTO in hallDTO.roomStatuses)
         {
             roomsDic.Add(roomStatusDTO.roomId,new RoomStatus(roomStatusDTO));
             
@@ -20,9 +21,9 @@ private Dictionary<int, RoomStatus> roomsDic;
     {
         return roomsDic;
     }
-    public Dictionary<int, string> getRoomsForHall()
+    public Dictionary<int, Tuple<string, string>> getRoomsForHall() //roomId -> (roomName, imageUrl)
     {
-        Dictionary<int, string> selectedRooms = new Dictionary<int, string>();
+        Dictionary<int, Tuple<string, string>> selectedRooms = new  Dictionary<int, Tuple<string, string>>();
 
         List<int> roomKeys = new List<int>(roomsDic.Keys);
         int roomsToSelect = Mathf.Min(6, roomKeys.Count);
@@ -40,7 +41,7 @@ private Dictionary<int, RoomStatus> roomsDic;
             RoomStatus roomStatus = roomsDic[randomKey];
             
             // Add the room to the selectedRooms dictionary
-            selectedRooms.Add(randomKey, roomStatus.GetRoomName());
+            selectedRooms.Add(randomKey, new Tuple<string, string>(roomStatus.GetRoomName(), roomStatus.GetImageUrl()));
 
             // Remove the selected room's key from the keys list to avoid duplicates
             roomKeys.RemoveAt(randomIndex);

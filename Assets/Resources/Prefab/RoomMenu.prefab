@@ -413,7 +413,8 @@ MonoBehaviour:
   m_text: Delete A Poster
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -631,7 +632,8 @@ MonoBehaviour:
   m_text: Enter msg...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -765,7 +767,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   msgIf: {fileID: 3451200059009144496}
-  textObject: {fileID: 8601846485511850276, guid: 41945fc62feecca4ab7271e2e57b0888, type: 3}
+  textObject: {fileID: 8601846485511850276, guid: 41945fc62feecca4ab7271e2e57b0888,
+    type: 3}
   scrollView: {fileID: 5457229538364521039}
 --- !u!1 &2045590346787571312
 GameObject:
@@ -986,7 +989,8 @@ MonoBehaviour:
   m_text: Create A New Room
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1914,7 +1918,8 @@ MonoBehaviour:
   m_text: Send Message
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2893,7 +2898,8 @@ MonoBehaviour:
   m_text: Send!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3029,7 +3035,8 @@ MonoBehaviour:
   m_text: Enter Poster Name...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3681,7 +3688,8 @@ MonoBehaviour:
   m_text: Lock Poster Postion
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3816,7 +3824,8 @@ MonoBehaviour:
   m_text: Upload Poster
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3943,7 +3952,8 @@ MonoBehaviour:
   lockPosterPositionBtn: {fileID: 5060234764222309895}
   sendPosterBtn: {fileID: 5060234764943746187}
   toggleGroup: {fileID: 8915112294027035602}
-  togglePrefab: {fileID: 1419511170135447214, guid: 13b7c2d9514a9084d8a77cff0311bb13, type: 3}
+  togglePrefab: {fileID: 1419511170135447214, guid: 13b7c2d9514a9084d8a77cff0311bb13,
+    type: 3}
   errorDeleteMsg: {fileID: 8690570484673085869}
 --- !u!1 &5060234765510774444
 GameObject:
@@ -4014,7 +4024,8 @@ MonoBehaviour:
   m_text: Choose Poster Postion
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4149,7 +4160,8 @@ MonoBehaviour:
   m_text: Delete Poster!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4717,7 +4729,8 @@ MonoBehaviour:
   m_text: Logout
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5617,7 +5630,8 @@ MonoBehaviour:
   m_text: Notifications
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5853,7 +5867,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 283, y: 325.53198}
+  m_AnchoredPosition: {x: 283, y: 325.532}
   m_SizeDelta: {x: -283, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6913599109898089065
@@ -6226,7 +6240,8 @@ MonoBehaviour:
   m_text: Back To Hall
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
-  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5, type: 2}
+  m_sharedMaterial: {fileID: -6631961586833376428, guid: 09b64c8f571ad4f5d82e766d754710f5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

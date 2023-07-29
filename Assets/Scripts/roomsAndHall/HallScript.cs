@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -10,11 +11,13 @@ public class HallScript : MonoBehaviour
 {
     [SerializeField] private GameObject background;
     [SerializeField] private Canvas canvas;
-    [SerializeField] private Text door0,door1,door2,door3,door4,door5;
+    [SerializeField] private Text[] doorSigns;
+    [SerializeField] private Image[] themeImages;
+    
     private HttpRequest httpRequest;
     private List<int> keys;
     private Vector3[] doorPositions; 
-    private Dictionary<int, string> roomsForHall;
+    private Dictionary<int, Tuple<string, string>> roomsForHall;
     private GameObject curPlayer;
     private Player playerData;
     private Dictionary<int, RoomStatus> roomStatuses;
@@ -27,21 +30,9 @@ public class HallScript : MonoBehaviour
     void Start()
     {
         playerData = PlayerDataManager.PlayerData;
-        // Create a background game objectGameObject background = new GameObject("Background");
-        background.transform.SetParent(canvas.transform);
-        // Attach a Sprite Renderer component to the background game object
-        SpriteRenderer backroundspriteRenderer = background.AddComponent<SpriteRenderer>();
-
-        // Set the background image as the sprite for the Sprite Renderer
-        backroundspriteRenderer.sprite = Resources.Load<Sprite>("Images/backrounnds/1193"); 
-
-        // Set the sorting layer of the background object to a lower value
-        backroundspriteRenderer.sortingLayerName = "Background";
-        backroundspriteRenderer.sortingOrder = -1;
-        
         httpRequest = new HttpRequest();
         GetHall();
-        
+        //LoadBackground()
         MovingScript movingScript = movingController.GetComponent<MovingScript>();
         curPlayer = movingScript.GetCurPlayer();
         GetDoors();
@@ -57,8 +48,8 @@ public class HallScript : MonoBehaviour
         if (res.Item1 == 200)
         {
             roomStatuses = new Dictionary<int, RoomStatus>();
-            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
-            foreach (RoomStatusDTO roomStatusDto in roomsDto.roomStatuses)
+            HallDTO hallDTO = JsonConvert.DeserializeObject<HallDTO>(res.Item2);
+            foreach (RoomStatusDTO roomStatusDto in hallDTO.roomStatuses)
             {
                 roomStatuses.Add(roomStatusDto.roomId, new RoomStatus(roomStatusDto));
             }
@@ -148,7 +139,7 @@ public class HallScript : MonoBehaviour
         
     }
 
-    public void Door0Btn()
+    /*public void Door0Btn()
     {
         GetIntoRoom(keys[0]);
     }
@@ -171,7 +162,8 @@ public class HallScript : MonoBehaviour
     public void Door5Btn()
     {
         GetIntoRoom(keys[5]);
-    }
+    }*/
+    
     public void GetIntoRoom(int room)
     {
         if (IsRoomMember(room))
@@ -187,8 +179,6 @@ public class HallScript : MonoBehaviour
             roomToJoin = room;
         }
     }
-    
-
     public void membershipBtn()
     {
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
@@ -206,7 +196,6 @@ public class HallScript : MonoBehaviour
             Debug.Log("request error");
         }
     }
-
     private bool IsRoomMember(int roomId)
     {
         if (roomStatuses[roomId].GetRoomMemberStatus() == RoomMemberStatus.MEMBER)
@@ -216,7 +205,6 @@ public class HallScript : MonoBehaviour
             return false;
         }
     }
-
     private void GetDoors()
     {
         //set doors positions
@@ -234,26 +222,52 @@ public class HallScript : MonoBehaviour
         var res = httpRequest.SendDataToServer(queryParams, "", "/hall", "GET");
         if (res.Item1 == 200)
         {
-            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
-            Rooms allRooms = new Rooms(roomsDto);
-            roomsForHall = allRooms.getRoomsForHall();
+            HallDTO hallDto = JsonConvert.DeserializeObject<HallDTO>(res.Item2);
+            Hall hall = new Hall(hallDto);
+            roomsForHall = hall.getRoomsForHall();
             keys = new List<int>();
-            foreach (var VARIABLE in roomsForHall.Keys)
+            foreach (var roomId in roomsForHall.Keys)
             {
-                keys.Add(VARIABLE);
+                keys.Add(roomId);
             }
-            //add room names to UI
-            door0.text = roomsForHall[keys[0]].ToString();
-            door1.text = roomsForHall[keys[1]].ToString();
-            door2.text = roomsForHall[keys[2]].ToString();
-            door3.text = roomsForHall[keys[3]].ToString();
-            door4.text = roomsForHall[keys[4]].ToString();
-            door5.text = roomsForHall[keys[5]].ToString();
-
+            //add room names and images to UI
+            for (int i = 0; i < doorSigns.Length; i++)
+            {
+                doorSigns[i].text = roomsForHall[keys[i]].Item1;
+                string imgUrl = roomsForHall[keys[i]].Item2;
+                if (imgUrl != null)
+                {
+                    themeImages[i].gameObject.SetActive(true);
+                    StartCoroutine(LoadImageCoroutine(imgUrl, i));
+                }
+                
+            }
+            
         }
+    }
+    private IEnumerator LoadImageCoroutine(string imgUrl, int index)
+    {
+        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(imgUrl))
+        {
+            yield return www.SendWebRequest();
 
-       
-
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(www);
+                if (texture != null)
+                {
+                    themeImages[index].sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                }
+                else
+                {
+                    Debug.LogError("Failed to load the image from URL: " + imgUrl);
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to load image from URL: " + imgUrl + "\nError: " + www.error);
+            }
+        }
     }
     public void closePopUp()
     { 
@@ -267,5 +281,20 @@ public class HallScript : MonoBehaviour
             new("userId", playerData.GetUserId())
         };
         var res = httpRequest.SendDataToServer(queryParams, jsonPos, "/updatePosition", "POST");
+    }
+
+    private void LoadBackground()
+    {
+        // Create a background game objectGameObject background = new GameObject("Background");
+        background.transform.SetParent(canvas.transform);
+        // Attach a Sprite Renderer component to the background game object
+        SpriteRenderer backroundspriteRenderer = background.AddComponent<SpriteRenderer>();
+
+        // Set the background image as the sprite for the Sprite Renderer
+        backroundspriteRenderer.sprite = Resources.Load<Sprite>("Images/backrounnds/1193"); 
+
+        // Set the sorting layer of the background object to a lower value
+        backroundspriteRenderer.sortingLayerName = "Background";
+        backroundspriteRenderer.sortingOrder = -1;
     }
 }

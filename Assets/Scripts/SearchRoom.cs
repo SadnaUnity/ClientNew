@@ -30,8 +30,8 @@ public class SearchRoom : MonoBehaviour
         var res = httpRequest.SendDataToServer(queryParams, "", "/hall", "GET");
         if (res.Item1 == 200)
         {
-            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
-            Dictionary<int, RoomStatus> allRooms = new Rooms(roomsDto).GetAllRooms();
+            HallDTO hallDTO = JsonConvert.DeserializeObject<HallDTO>(res.Item2);
+            Dictionary<int, RoomStatus> allRooms = new Hall(hallDTO).GetAllRooms();
             string roomName = roomInputField.text;
             roomInputField.text = "";
             GetIntoRoomIfExists(roomName, allRooms);
