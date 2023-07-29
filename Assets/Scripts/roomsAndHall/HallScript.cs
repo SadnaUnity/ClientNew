@@ -57,8 +57,8 @@ public class HallScript : MonoBehaviour
         if (res.Item1 == 200)
         {
             roomStatuses = new Dictionary<int, RoomStatus>();
-            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
-            foreach (RoomStatusDTO roomStatusDto in roomsDto.roomStatuses)
+            HallDTO hallDTO = JsonConvert.DeserializeObject<HallDTO>(res.Item2);
+            foreach (RoomStatusDTO roomStatusDto in hallDTO.roomStatuses)
             {
                 roomStatuses.Add(roomStatusDto.roomId, new RoomStatus(roomStatusDto));
             }
@@ -234,9 +234,9 @@ public class HallScript : MonoBehaviour
         var res = httpRequest.SendDataToServer(queryParams, "", "/hall", "GET");
         if (res.Item1 == 200)
         {
-            RoomsDTO roomsDto = JsonConvert.DeserializeObject<RoomsDTO>(res.Item2);
-            Rooms allRooms = new Rooms(roomsDto);
-            roomsForHall = allRooms.getRoomsForHall();
+            HallDTO hallDto = JsonConvert.DeserializeObject<HallDTO>(res.Item2);
+            Hall hall = new Hall(hallDto);
+            roomsForHall = hall.getRoomsForHall();
             keys = new List<int>();
             foreach (var VARIABLE in roomsForHall.Keys)
             {

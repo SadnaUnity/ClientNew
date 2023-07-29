@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using TMPro;
@@ -18,6 +19,7 @@ public class CreateAroomSCript : MonoBehaviour
     private Player playerData;
     private int chosenBackIndex;
     private float shadow;
+    private byte[] themeImgFile;
     
     // Start is called before the first frame update
     void Start()
@@ -35,36 +37,32 @@ public class CreateAroomSCript : MonoBehaviour
 
     public void CreateARoomBtn()
     {
-     
-        httpRequest = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
+        string backName = GetBackgroundName(chosenBackIndex);
+        
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("roomName", RoomName.text),
         };
         List<KeyValuePair<string, object>> body = new List<KeyValuePair<string, object>>
         {
-            new KeyValuePair<string, object>("managerId", playerData.GetUserId()),
-            new KeyValuePair<string, object>("privacy", Private.isOn),
-            new KeyValuePair<string, object>("description", "hi")
-
+            new ("managerId", playerData.GetUserId()),
+            new ("privacy", Private.isOn),
+            new ("description", "hi"),
+            new ("background", backName)
         };
 
         Dictionary<string, object> jsonBody = body.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         string bodyString = JsonConvert.SerializeObject(jsonBody, Formatting.Indented);
         
         var res = httpRequest.SendDataToServer(queryParams, bodyString, "/room", "POST");
+        
         if (res.Item1 == 200)
         {
-            RoomStatusDTO roomStatusDto = JsonConvert.DeserializeObject<RoomStatusDTO>(res.Item2);
-            PlayerDataManager.PlayerData.SetRoomId(roomStatusDto.roomId);
-            httpRequest = new HttpRequest();
-            List<KeyValuePair<string, object>> queryPar = new List<KeyValuePair<string, object>>
-            {
-                new("userId", playerData.GetUserId())
-            };
-            httpRequest.SendDataToServer(queryPar, "", "/getOutFromRoom", "POST");
-            SceneManager.LoadScene("Moving");
+            RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
+            int roomId = roomDataDto.room.roomId;
+            PlayerDataManager.PlayerData.SetRoomId(roomId);
+            SendThemeImg(roomId);
         }
         else
         {
@@ -73,13 +71,49 @@ public class CreateAroomSCript : MonoBehaviour
 
     }
 
+    private void SendThemeImg(int roomId)
+    {
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        
+        var res = httpRequest.SendDataToServer(queryParams, "file", themeImgFile, $"/roomImage/{roomId}");
+        if (res.Item1 == 200)
+        {
+            Debug.Log("theme image upload success");
+        }
+        else
+        {
+            Debug.Log("theme image upload ERROR!");
+        }
+    }
+
+    private string GetBackgroundName(int i)
+    {
+        return i switch
+        {
+            0 => "BACKGROUND_1",
+            1 => "BACKGROUND_2",
+            2 => "BACKGROUND_3",
+            3 => "BACKGROUND_4",
+            _ => ""
+        };
+    }
+
     public void ChooseImgThemeBtn()
     {
-        
+        // Show file dialog to choose an image file
+        string[] extensions = { "jpg", "jpg", "png", "png" };
+        string path = UnityEditor.EditorUtility.OpenFilePanelWithFilters("Choose an image file", "", extensions);
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            themeImgFile = File.ReadAllBytes(path);
+        }
     }
     public void ClickedBackBtn()
     {
-        httpRequest = new HttpRequest();
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("userId", playerData.GetUserId())
