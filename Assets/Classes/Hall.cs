@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Rooms
+public class Hall
 {
 private Dictionary<int, RoomStatus> roomsDic;
-    public Rooms(RoomsDTO roomsDTO)
+    public Hall(HallDTO hallDTO)
     {
         this.roomsDic = new Dictionary<int, RoomStatus>();
-        foreach (var roomStatusDTO in roomsDTO.roomStatuses)
+        foreach (var roomStatusDTO in hallDTO.roomStatuses)
         {
             roomsDic.Add(roomStatusDTO.roomId,new RoomStatus(roomStatusDTO));
             
