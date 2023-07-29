@@ -17,7 +17,9 @@ public class NotificationsScript : MonoBehaviour
     private HttpRequest httpRequest;
     private Player playerData;
     [SerializeField] private GameObject popUpWindow;
-    [SerializeField] private TMP_Text textObject;
+    [SerializeField] private TMP_Text textObject1;
+    [SerializeField] private TMP_Text textObject2;
+
     private RoomRequests roomRequests;
     private bool popUpIsOn = false;
 
@@ -36,66 +38,105 @@ public class NotificationsScript : MonoBehaviour
     }
 
     public void clickedBtn()
+{
+    if (popUpIsOn)
     {
-        if (popUpIsOn)
+        popUpWindow.SetActive(false);
+        popUpIsOn = false;
+        TMP_Text[] messageTextObjects = popUpWindow.GetComponentsInChildren<TMP_Text>();
+        foreach (TMP_Text messageTextObject in messageTextObjects)
         {
-            popUpWindow.SetActive(false);
-            popUpIsOn = false;
+            Destroy(messageTextObject.gameObject);
         }
-        else
-        {
-            popUpWindow.SetActive(true);
-            popUpIsOn = true;
-        }
+    }
+    else
+    {
+        popUpWindow.SetActive(true);
+        popUpIsOn = true;
+
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("managerId", playerData.GetUserId())
         };
-        var res = httpRequest.SendDataToServer(queryParams, "", "/waitingJoinRoomRequests", "GET"); 
+        var res = httpRequest.SendDataToServer(queryParams, "", "/waitingJoinRoomRequests", "GET");
+        int y = 0;
+
         if (res.Item1 == 200)
         {
-            int y = 0;
             RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res.Item2);
+            if (requstesDto.joinRoomRequests != null)
+            {
+                roomRequests = new RoomRequests(requstesDto);
+                for (int i = 0; i < requstesDto.joinRoomRequests.Count; i++)
+                {
+                    var requst = requstesDto.joinRoomRequests[i];
+
+                    TMP_Text newMsg = Instantiate(textObject1, popUpWindow.transform);
+                    newMsg.text = requst.username.ToString() + " Wants to be a member in room " +
+                                  requst.roomId.ToString();
+                    newMsg.fontSize = 18;
+
+                    // Set the position of the new text object within the popup window
+                    RectTransform newMsgRectTransform = newMsg.GetComponent<RectTransform>();
+                    newMsgRectTransform.anchoredPosition = new Vector2(1458f, 521f + y);
+                    // Create local variables for the button listeners
+                    int index = i;
+                    Button approveButton = newMsg.GetComponentInChildren<Button>();
+                    approveButton.onClick.AddListener(() => ApproveRequest());
+
+                    Button declineButton = newMsg.GetComponentInChildren<Button>();
+                    declineButton.onClick.AddListener(() => DeclineRequest());
+
+                    y += 100;
+                }
+            }
+        }
+
+        List<KeyValuePair<string, object>> queryParams2 = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        var res2 = httpRequest.SendDataToServer(queryParams2, "", "/completedRequests", "GET");
+        if (res2.Item1 == 200)
+        {
+            RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res2.Item2);
             roomRequests = new RoomRequests(requstesDto);
             for (int i = 0; i < requstesDto.joinRoomRequests.Count; i++)
             {
                 var requst = requstesDto.joinRoomRequests[i];
 
-                TMP_Text newMsg = Instantiate(textObject, popUpWindow.transform);
-                newMsg.text = requst.userId.ToString() + " Wants to be a member in room " + requst.roomId.ToString();
+                TMP_Text newMsg2 = Instantiate(textObject2, popUpWindow.transform);
+                newMsg2.text = "your request to join room " + requst.roomId + " has been " + requst.requestStatus;
+                newMsg2.fontSize = 18;
 
                 // Set the position of the new text object within the popup window
-                RectTransform newMsgRectTransform = newMsg.GetComponent<RectTransform>();
-                newMsgRectTransform.anchoredPosition = new Vector2(1458f, 521f + y);
-
-                // Create local variables for the button listeners
-                int index = i;
-                Button approveButton = newMsg.GetComponentInChildren<Button>();
-                approveButton.onClick.AddListener(() => ApproveRequest(index));
-
-                Button declineButton = newMsg.GetComponentInChildren<Button>();
-                declineButton.onClick.AddListener(() => DeclineRequest(index));
-
+                RectTransform newMsgRectTransform = newMsg2.GetComponent<RectTransform>();
+                newMsgRectTransform.anchoredPosition = new Vector2(1010f, 521f + y);
                 y += 100;
             }
         }
-
     }
+}
 
-    private void ApproveRequest(int index)
+
+    private void ApproveOrDeclien(int index)
     {
-        JoinRoomReq requestToApprove = roomRequests.GetJoinRoonmReq()[index];
+        JoinRoomReq requestToApprove = roomRequests.GetJoinRoonmReq()[index - 1];
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("managerId", playerData.GetUserId())
         };
-        List<KeyValuePair<string, object>> body = new List<KeyValuePair<string, object>>
+        if (index == 1)
         {
-            new KeyValuePair<string, object>("userId", roomRequests.GetJoinRoonmReq()[index].GetUserId()),
-            new KeyValuePair<string, object>("roomId", roomRequests.GetJoinRoonmReq()[index].GetRoomID()),
-            new KeyValuePair<string, object>("requestStatus", "APPROVED")
+            requestToApprove.SetStatus("APPROVED");
+        }
+        else
+        {
+            requestToApprove.SetStatus("DECLINED");
 
-        };
+        }
+        List<JoinRoomReqDTO> body = new List<JoinRoomReqDTO>();
+        body.Add(new JoinRoomReqDTO(requestToApprove));
         //Dictionary<string, object> jsonBody = body.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         string bodyString = JsonConvert.SerializeObject(body, Formatting.Indented);
 
@@ -104,31 +145,17 @@ public class NotificationsScript : MonoBehaviour
         {
             Debug.Log("success");
             clickedBtn();
+            clickedBtn();
         }
     }
 
-    private void DeclineRequest(int index)
+    private void ApproveRequest()
     {
-        var requestToDecline = roomRequests.GetJoinRoonmReq()[index];
-        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
-        {
-            new("managerId", playerData.GetUserId())
-        };
-        List<KeyValuePair<string, object>> body = new List<KeyValuePair<string, object>>
-        {
-            new KeyValuePair<string, object>("userId", roomRequests.GetJoinRoonmReq()[index].GetUserId()),
-            new KeyValuePair<string, object>("roomId", roomRequests.GetJoinRoonmReq()[index].GetRoomID()),
-            new KeyValuePair<string, object>("requestStatus", "DECLINED")
+        ApproveOrDeclien(1);
+    }
 
-        };
-        Dictionary<string, object> jsonBody = body.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        string bodyString = JsonConvert.SerializeObject(jsonBody, Formatting.Indented);
-
-        var res = httpRequest.SendDataToServer(queryParams, bodyString, "/handlePendingJoinRequests", "POST");
-        if (res.Item1 == 200)
-        {
-            Debug.Log("success");
-        }    }
-
-
+    private void DeclineRequest()
+    {
+        ApproveOrDeclien(2);
+    }
 }
