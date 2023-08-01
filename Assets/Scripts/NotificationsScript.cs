@@ -7,10 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-enum Status
-{
-    PENDING,DECLINED,APPROVED
-}
+
 public class NotificationsScript : MonoBehaviour
 {
     
