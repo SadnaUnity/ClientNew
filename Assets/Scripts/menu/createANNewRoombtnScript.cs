@@ -14,12 +14,6 @@ public class createANNewRoombtnScript : MonoBehaviour
         playerData = PlayerDataManager.PlayerData;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void ClickedBtn()
     {
         SceneManager.LoadScene("CreateANewRoom");

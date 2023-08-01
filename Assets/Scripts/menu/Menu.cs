@@ -24,8 +24,8 @@ public class Menu : MonoBehaviour
         showMenu = true;
         menuPanel.SetActive(showMenu);
         notification.SetActive(false);
+        btnRectTransform.anchoredPosition = new Vector2(-890, 500);
         InvokeRepeating("UnseenNotification", 0f, 4f);
-
     }
     public void ShowHideMenu()
     {
@@ -33,14 +33,14 @@ public class Menu : MonoBehaviour
         if (showMenu)
         {
             menuPanel.SetActive(true);
-            btnRectTransform.anchoredPosition = new Vector2(-900, 480);
+            btnRectTransform.anchoredPosition = new Vector2(-890, 500);
             notificationBtnRectTransform.anchoredPosition = new Vector2(-875, 440);
 
         }
         else
         {
             menuPanel.SetActive(false);
-            btnRectTransform.anchoredPosition = new Vector2(-1200, 480);
+            btnRectTransform.anchoredPosition = new Vector2(-1190, 500);
             notificationBtnRectTransform.anchoredPosition = new Vector2(-1175, 440);
 
         }
