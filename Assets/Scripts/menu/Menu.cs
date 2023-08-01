@@ -21,10 +21,10 @@ public class Menu : MonoBehaviour
         playerData = PlayerDataManager.PlayerData;
         btnRectTransform = menuBtn.GetComponent<RectTransform>();
         notificationBtnRectTransform = notification.GetComponent<RectTransform>();
-        showMenu = false;
+        showMenu = true;
         menuPanel.SetActive(showMenu);
         notification.SetActive(false);
-        btnRectTransform.anchoredPosition = new Vector2(-1190, 500);
+        btnRectTransform.anchoredPosition = new Vector2(-890, 500);
         InvokeRepeating("UnseenNotification", 0f, 4f);
     }
     public void ShowHideMenu()
