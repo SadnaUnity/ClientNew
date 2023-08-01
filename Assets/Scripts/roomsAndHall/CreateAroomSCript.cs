@@ -82,6 +82,8 @@ public class CreateAroomSCript : MonoBehaviour
         if (res.Item1 == 200)
         {
             Debug.Log("theme image upload success");
+            //TODO: load hall
+            SceneManager.LoadScene("Moving");
         }
         else
         {
