@@ -138,32 +138,6 @@ public class HallScript : MonoBehaviour
         }
         
     }
-
-    /*public void Door0Btn()
-    {
-        GetIntoRoom(keys[0]);
-    }
-    public void Door1Btn()
-    {
-        GetIntoRoom(keys[1]);
-    }
-    public void Door2Btn()
-    {
-        GetIntoRoom(keys[2]);
-    }
-    public void Door3Btn()
-    {
-        GetIntoRoom(keys[3]);
-    }
-    public void Door4Btn()
-    {
-        GetIntoRoom(keys[4]);
-    }
-    public void Door5Btn()
-    {
-        GetIntoRoom(keys[5]);
-    }*/
-    
     public void GetIntoRoom(int room)
     {
         if (IsRoomMember(room))
@@ -291,7 +265,7 @@ public class HallScript : MonoBehaviour
         SpriteRenderer backroundspriteRenderer = background.AddComponent<SpriteRenderer>();
 
         // Set the background image as the sprite for the Sprite Renderer
-        backroundspriteRenderer.sprite = Resources.Load<Sprite>("Images/backrounnds/1193"); 
+        backroundspriteRenderer.sprite = Resources.Load<Sprite>("Images/backrounnds/hall"); 
 
         // Set the sorting layer of the background object to a lower value
         backroundspriteRenderer.sortingLayerName = "Background";

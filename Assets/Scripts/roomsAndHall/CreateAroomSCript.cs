@@ -60,9 +60,7 @@ public class CreateAroomSCript : MonoBehaviour
         if (res.Item1 == 200)
         {
             RoomDataDTO roomDataDto = JsonConvert.DeserializeObject<RoomDataDTO>(res.Item2);
-            int roomId = roomDataDto.room.roomId;
-            PlayerDataManager.PlayerData.SetRoomId(roomId);
-            SendThemeImg(roomId);
+            SendThemeImg(roomDataDto.room.roomId);
         }
         else
         {
@@ -82,8 +80,8 @@ public class CreateAroomSCript : MonoBehaviour
         if (res.Item1 == 200)
         {
             Debug.Log("theme image upload success");
-            //TODO: load hall
-            SceneManager.LoadScene("Moving");
+            PlayerDataManager.PlayerData.SetRoomId(roomId);
+            SceneManager.LoadScene("Room");
         }
         else
         {
