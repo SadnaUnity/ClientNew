@@ -5708,6 +5708,7 @@ MonoBehaviour:
   popUpWindow: {fileID: 387387115}
   textObject1: {fileID: 8902948837327513295, guid: f150418e5e6834858b4e9dabb32c8fc2, type: 3}
   textObject2: {fileID: 8601846485511850276, guid: 41945fc62feecca4ab7271e2e57b0888, type: 3}
+  newNotificationAlert: {fileID: 590193680}
 --- !u!1 &1926948770
 GameObject:
   m_ObjectHideFlags: 0
