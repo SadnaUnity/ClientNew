@@ -765,7 +765,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   msgIf: {fileID: 3451200059009144496}
-  textObject: {fileID: 8601846485511850276, guid: 41945fc62feecca4ab7271e2e57b0888, type: 3}
+  textObject: {fileID: 8601846485511850276, guid: 8e5ca18763b714b5baadd37b0d14db51, type: 3}
   scrollView: {fileID: 5457229538364521039}
 --- !u!1 &2045590346787571312
 GameObject:
@@ -5853,7 +5853,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 325.53195}
+  m_AnchoredPosition: {x: 0, y: 325.53198}
   m_SizeDelta: {x: -283, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6913599109898089065
@@ -6151,7 +6151,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1669441774394000979}
   m_HandleRect: {fileID: 1264163293410375708}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

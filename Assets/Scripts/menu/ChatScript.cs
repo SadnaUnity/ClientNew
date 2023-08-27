@@ -1,18 +1,23 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Classes.DTO;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class ChatScript : MonoBehaviour
 {
-    private string ipAddress = "127.0.0.1";
+    /*private string ipAddress = "127.0.0.1";
     private int port = 8080;
-    private ClientWebSocket clientWebSocket;
+    private ClientWebSocket clientWebSocket;*/
 
     [SerializeField] private TMP_InputField msgIf;
     private RectTransform chatContent;
@@ -20,22 +25,29 @@ public class ChatScript : MonoBehaviour
     [SerializeField] private ScrollRect scrollView;
     private int msgCount;
     private List<TMP_Text> msgList;
-    private bool isClosing = false;
+    //private bool isClosing = false;
     private float msgHeight;
-    public async void Start()
+    private HttpRequest httpRequest;
+    private Player playerData;
+    private long lastUpdateTimeStamp;
+    public void Start()
     {
+        lastUpdateTimeStamp = 0;
+        playerData = PlayerDataManager.PlayerData;
+        httpRequest = new HttpRequest();
         scrollView.content.anchoredPosition = new Vector2(0, 325f);
         chatContent = scrollView.content;
         msgHeight = textObject.GetComponent<RectTransform>().rect.height;
         msgCount = 0;
         msgList = new List<TMP_Text>();
 
-        clientWebSocket = new ClientWebSocket();
-        Uri serverUri = new Uri($"ws://{ipAddress}:{port}/chat");
-
         TMP_Text newMsg = Instantiate(textObject, chatContent.transform);
         newMsg.text = $"Chat Room {PlayerDataManager.PlayerData.GetRoomId()}!";
 
+        StartCoroutine(GetMsgs());
+        /*clientWebSocket = new ClientWebSocket();
+        Uri serverUri = new Uri($"ws://{ipAddress}:{port}/chat");
+        
         try
         {
             var token = new CancellationToken();
@@ -48,10 +60,83 @@ public class ChatScript : MonoBehaviour
             Debug.LogError($"Error connecting to server: {e.Message}");
         }
 
-        ReceiveMessages();
+        ReceiveMessages();*/
     }
 
-    private async void ReceiveMessages()
+    public void SendMsg()
+    {
+        string message = msgIf.text;
+        msgIf.text = "";
+        
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId()),
+            new("roomId", playerData.GetRoomId())
+        };
+        List<KeyValuePair<string, object>> body = new List<KeyValuePair<string, object>>
+        {
+            new ("content", message),
+            new ("sender", playerData.GetUserName()),
+            new ("timestamp", DateTimeOffset.Now.ToUnixTimeMilliseconds())
+        };
+        Dictionary<string, object> jsonBody = body.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        string bodyString = JsonConvert.SerializeObject(jsonBody, Formatting.Indented);
+
+        var res = httpRequest.SendDataToServer(queryParams, bodyString, "/echo", "PUT");
+    }
+    private void AddMessageToChat(string message)
+    {
+        TMP_Text newMsg = Instantiate(textObject, chatContent.transform);
+        newMsg.text = message;
+
+        msgList.Add(newMsg);
+        msgCount++;
+
+        if (msgCount > 100)
+        {
+            Destroy(msgList[0].gameObject);
+            msgList.RemoveAt(0);
+            msgCount--;
+        }
+
+        
+        scrollView.GetComponent<ScrollRect>().verticalNormalizedPosition = 0;
+    }
+
+    private IEnumerator GetMsgs()
+    {
+        yield return new WaitForSeconds(2f);
+        while (true)
+        {
+            List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+            {
+                new("userId", playerData.GetUserId()),
+                new("roomId", playerData.GetRoomId()),
+                new("timestamp", lastUpdateTimeStamp)
+            };
+
+            lastUpdateTimeStamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            var res = httpRequest.SendDataToServer(queryParams, "", "/chat", "GET");
+            if (res.Item1 == 200)
+            {
+                ChatResDto chatResDto = JsonConvert.DeserializeObject<ChatResDto>(res.Item2);
+                foreach (MsgDto msgDto in chatResDto.messageList)
+                {
+                    AddMessageToChat(msgDto.sender + ": " + msgDto.content);
+                }
+                
+            }
+            else
+            {
+                Debug.LogError("chat get error!");
+            }
+            
+            yield return new WaitForSeconds(3f);
+        }
+        
+    }
+    
+    /*private async void ReceiveMessages()
     {
         byte[] buffer = new byte[1024];
 
@@ -76,23 +161,7 @@ public class ChatScript : MonoBehaviour
         Debug.Log("WebSocket connection closed");
     }
 
-    private void AddMessageToChat(string message)
-    {
-        TMP_Text newMsg = Instantiate(textObject, chatContent.transform);
-        newMsg.text = message;
-
-        msgList.Add(newMsg);
-        msgCount++;
-
-        if (msgCount > 100)
-        {
-            Destroy(msgList[0].gameObject);
-            msgList.RemoveAt(0);
-            msgCount--;
-        }
-
-        scrollView.GetComponent<ScrollRect>().verticalNormalizedPosition = 0;
-    }
+    
 
     public async void SendMsg()
     {
@@ -134,6 +203,6 @@ public class ChatScript : MonoBehaviour
             clientWebSocket.Dispose();
             clientWebSocket = null;
         }
-    }
+    }*/
 
 }

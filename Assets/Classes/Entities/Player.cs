@@ -26,6 +26,11 @@ public class Player
     {
         return roomId;
     }
+
+    public string GetUserName()
+    {
+        return username;
+    }
     public Avatar GetAvatar()
     {
         return avatar;
