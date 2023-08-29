@@ -16,6 +16,7 @@ public class NotificationsScript : MonoBehaviour
     [SerializeField] private GameObject popUpWindow;
     [SerializeField] private TMP_Text textObject1;
     [SerializeField] private TMP_Text textObject2;
+    [SerializeField] private GameObject newNotificationAlert;
 
     private RoomRequests roomRequests;
     private bool popUpIsOn = false;
@@ -25,6 +26,7 @@ public class NotificationsScript : MonoBehaviour
     {
         httpRequest = new HttpRequest();
         playerData = PlayerDataManager.PlayerData;
+        StartCoroutine(CallNotificationsFunctionRepeatedly());
 
     }
 
@@ -50,8 +52,14 @@ public class NotificationsScript : MonoBehaviour
     {
         popUpWindow.SetActive(true);
         popUpIsOn = true;
+        getNotifications();
 
-        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+    }
+}
+
+    private void getNotifications()
+    {
+         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("managerId", playerData.GetUserId())
         };
@@ -61,7 +69,7 @@ public class NotificationsScript : MonoBehaviour
         if (res.Item1 == 200)
         {
             RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res.Item2);
-            if (requstesDto.joinRoomRequests != null)
+            if (requstesDto.joinRoomRequests != null && requstesDto.joinRoomRequests.Count > 0)
             {
                 roomRequests = new RoomRequests(requstesDto);
                 for (int i = 0; i < requstesDto.joinRoomRequests.Count; i++)
@@ -97,24 +105,29 @@ public class NotificationsScript : MonoBehaviour
         if (res2.Item1 == 200)
         {
             RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res2.Item2);
-            roomRequests = new RoomRequests(requstesDto);
-            for (int i = 0; i < requstesDto.joinRoomRequests.Count; i++)
+            if (requstesDto.joinRoomRequests != null)
             {
-                var requst = requstesDto.joinRoomRequests[i];
+                roomRequests = new RoomRequests(requstesDto);
+                for (int i = 0; i < requstesDto.joinRoomRequests.Count; i++)
+                {
+                    var requst = requstesDto.joinRoomRequests[i];
 
-                TMP_Text newMsg2 = Instantiate(textObject2, popUpWindow.transform);
-                newMsg2.text = "your request to join room " + requst.roomId + " has been " + requst.requestStatus;
-                newMsg2.fontSize = 18;
+                    TMP_Text newMsg2 = Instantiate(textObject2, popUpWindow.transform);
+                    newMsg2.text = "your request to join room " + requst.roomId + " has been " + requst.requestStatus;
+                    newMsg2.fontSize = 18;
 
-                // Set the position of the new text object within the popup window
-                RectTransform newMsgRectTransform = newMsg2.GetComponent<RectTransform>();
-                newMsgRectTransform.anchoredPosition = new Vector2(1010f, 521f + y);
-                y += 100;
+                    // Set the position of the new text object within the popup window
+                    RectTransform newMsgRectTransform = newMsg2.GetComponent<RectTransform>();
+                    newMsgRectTransform.anchoredPosition = new Vector2(1010f, 521f + y);
+                    
+                    Button seenButton = newMsg2.GetComponentInChildren<Button>();
+                    seenButton.onClick.AddListener(() => seenRequest(i));
+                    
+                    y += 100;
+                }
             }
         }
     }
-}
-
 
     private void ApproveOrDeclien(int index)
     {
@@ -155,4 +168,79 @@ public class NotificationsScript : MonoBehaviour
     {
         ApproveOrDeclien(2);
     }
+
+    private void seenRequest(int index)
+    {
+        JoinRoomReq requestToApprove = roomRequests.GetJoinRoonmReq()[index - 1];
+
+        List<JoinRoomReqDTO> approvedRequests = new List<JoinRoomReqDTO>();
+        approvedRequests.Add(new JoinRoomReqDTO(requestToApprove));
+
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+    
+        string bodyString = JsonConvert.SerializeObject(approvedRequests, Formatting.Indented);
+    
+        var res = httpRequest.SendDataToServer(queryParams, bodyString, "/approveRequest", "POST");
+        if (res.Item1 == 200)
+        {
+            Debug.Log("Completed request seen and approved.");
+            clickedBtn();
+            clickedBtn();        }
+        else
+        {
+            Debug.LogError("Error while trying to approve completed request.");
+        }
+    }
+
+    private IEnumerator CallNotificationsFunctionRepeatedly()
+    {
+        while (true) // This will keep the coroutine running indefinitely
+        {
+            // Call your function here
+            NewNotification();
+
+            // Wait for 5 seconds
+            yield return new WaitForSeconds(5f);
+        }
+    }
+
+    private void NewNotification()
+    {
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
+        {
+            new("managerId", playerData.GetUserId())
+        };
+        var res = httpRequest.SendDataToServer(queryParams, "", "/waitingJoinRoomRequests", "GET");
+
+        
+        
+        List<KeyValuePair<string, object>> queryParams2 = new List<KeyValuePair<string, object>>
+        {
+            new("userId", playerData.GetUserId())
+        };
+        var res2 = httpRequest.SendDataToServer(queryParams2, "", "/completedRequests", "GET");
+        if (res2.Item1 == 200 &&  res.Item1 == 200)
+        {
+            RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res.Item2);
+
+            RequstesDTO requstesDto2 = JsonConvert.DeserializeObject<RequstesDTO>(res2.Item2);
+            if (requstesDto2.joinRoomRequests != null && requstesDto2.joinRoomRequests.Count > 0
+                || requstesDto.joinRoomRequests != null && requstesDto.joinRoomRequests.Count > 0)
+            {
+                newNotificationAlert.SetActive(true);
+            }
+            else
+            {
+                newNotificationAlert.SetActive(false);
+            }
+            
+        }
+        
+        
+
+    }
+
 }

@@ -25,7 +25,6 @@ public class Menu : MonoBehaviour
         menuPanel.SetActive(showMenu);
         notification.SetActive(false);
         btnRectTransform.anchoredPosition = new Vector2(-890, 500);
-        InvokeRepeating("UnseenNotification", 0f, 4f);
     }
     public void ShowHideMenu()
     {
@@ -48,26 +47,5 @@ public class Menu : MonoBehaviour
         
     }
 
-    private void UnseenNotification()
-    {
-        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
-        {
-            new("managerId", playerData.GetUserId())
-        };
-        var res = httpRequest.SendDataToServer(queryParams, "", "/waitingJoinRoomRequests", "GET");
-        if (res.Item1 == 200)
-        {
-            RequstesDTO requstesDto = JsonConvert.DeserializeObject<RequstesDTO>(res.Item2);
-            
-            if (requstesDto.joinRoomRequests != null)
-            {
-                notification.SetActive(true);
-            }
-            else
-            {
-                notification.SetActive(false);
-            }
-
-        }
-    }
+    
 }
