@@ -119,28 +119,15 @@ public class HallScript : MonoBehaviour
         if (enteredARoom)
         {
             
-            if (IsRoomMember(room))
-            {
-                PlayerDataManager.PlayerData.SetRoomId(room);
-                SceneManager.LoadScene("Room");
-            }
-            else
-            {
-                Vector3 pos = new Vector3(956f, 185f, 0);
-                curPlayer.transform.position = pos;
-                MovingScript movingScript = movingController.GetComponent<MovingScript>();
-                movingScript.SetMousePosition(pos);
-                SendPosition(pos);
-                popupWindow.ShowPopup();
-                roomToJoin = room;
-            }
+          GetIntoRoom(room);
             
         }
         
     }
     public void GetIntoRoom(int room)
     {
-        if (IsRoomMember(room))
+        
+        if (IsRoomMember(room) || roomStatuses[room].getPrivecy() == false)
         {
             PlayerDataManager.PlayerData.SetRoomId(room);
             SceneManager.LoadScene("Room");
