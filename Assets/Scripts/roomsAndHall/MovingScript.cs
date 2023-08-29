@@ -160,8 +160,7 @@ public class MovingScript : MonoBehaviour
             {
                 Debug.Log("GET request failed: " + res.Item2);
             }
-
-            // Wait for one second before sending another GET request
+            
             yield return new WaitForSeconds(0.4f);
         }
     }
