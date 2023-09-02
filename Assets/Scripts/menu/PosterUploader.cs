@@ -44,7 +44,7 @@ public class PosterUploader : MonoBehaviour
         playerData = PlayerDataManager.PlayerData;
         posterIdToGameObject = new Dictionary<int, GameObject>();
         posterIdToPosterName = new Dictionary<int, string>();
-        GetRoomPosters();
+        StartCoroutine(StartGetRoomPostersCoroutine());
         toggleToPosterId = new Dictionary<Toggle, int>();
     }
 
@@ -267,6 +267,16 @@ public class PosterUploader : MonoBehaviour
             posterIdToPosterName.Remove(selectedPosterId);
         }
     }
+    
+    private IEnumerator StartGetRoomPostersCoroutine()
+    {
+        while (true)
+        {
+            GetRoomPosters(); // Call your existing method
+            yield return new WaitForSeconds(3f); // Wait for 3 seconds before running it again
+        }
+    }
+    
     private void GetRoomPosters()
     {
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
@@ -288,7 +298,7 @@ public class PosterUploader : MonoBehaviour
         }
         else
         {
-            Debug.Log("Error get room id: " + playerData.GetRoomId());
+            Debug.Log("Error get room posters " + playerData.GetRoomId());
         }
     }
     IEnumerator LoadImageFromURL(string url, Vector3 position, PosterDTO posterDto)
