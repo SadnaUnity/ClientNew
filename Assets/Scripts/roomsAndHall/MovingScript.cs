@@ -209,7 +209,8 @@ public class MovingScript : MonoBehaviour
 
         // Add a SpriteRenderer component to the new GameObject
         SpriteRenderer spriteRenderer = character.AddComponent<SpriteRenderer>();
-        
+
+        spriteRenderer.sortingOrder = 1;
         // Assign the sprite to the SpriteRenderer component and load img
         spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(avatarPosition.Item1));
 
