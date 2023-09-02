@@ -128,7 +128,7 @@ public class ChatScript : MonoBehaviour
             }
             else
             {
-                Debug.LogError("chat get error!");
+               // Debug.LogError("chat get error!");
             }
             
             yield return new WaitForSeconds(3f);

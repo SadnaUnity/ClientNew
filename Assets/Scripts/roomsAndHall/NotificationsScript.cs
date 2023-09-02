@@ -4,6 +4,7 @@ using System.Linq;
 using Classes;
 using Newtonsoft.Json;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -86,14 +87,25 @@ public class NotificationsScript : MonoBehaviour
                     RectTransform newMsgRectTransform = newMsg.GetComponent<RectTransform>();
                     newMsgRectTransform.anchoredPosition = new Vector2(1458f, 521f + y);
                     // Create local variables for the button listeners
-                    int index = i;
-                    Button approveButton = newMsg.GetComponentInChildren<Button>();
-                    approveButton.onClick.AddListener(() => ApproveRequest());
+                    
+                    Button[] buttons = newMsg.GetComponentsInChildren<Button>();
+                    foreach (Button button in buttons)
+                    {
+                        if (button.tag == "accept")
+                        {
+                            button.onClick.AddListener(() => ApproveOrDeclien(requst,"APPROVED"));
+                            
+                        }
+                        else if (button.tag =="decline")
+                        {
+                            button.onClick.AddListener(() => ApproveOrDeclien(requst,"DECLINED"));
 
-                    Button declineButton = newMsg.GetComponentInChildren<Button>();
-                    declineButton.onClick.AddListener(() => DeclineRequest());
+                        }
 
-                    y += 100;
+                    }
+                   
+
+                  y += 100;
                 }
             }
         }
@@ -130,22 +142,16 @@ public class NotificationsScript : MonoBehaviour
         }
     }
 
-    private void ApproveOrDeclien(int index)
+    private void ApproveOrDeclien(JoinRoomReqDTO request, string str)
     {
-        JoinRoomReq requestToApprove = roomRequests.GetJoinRoonmReq()[index - 1];
+        JoinRoomReq requestToApprove = new JoinRoomReq(request);
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
             new("managerId", playerData.GetUserId())
         };
-        if (index == 1)
-        {
-            requestToApprove.SetStatus("APPROVED");
-        }
-        else
-        {
-            requestToApprove.SetStatus("DECLINED");
-
-        }
+       
+        requestToApprove.SetStatus(str);
+            
         List<JoinRoomReqDTO> body = new List<JoinRoomReqDTO>();
         body.Add(new JoinRoomReqDTO(requestToApprove));
         //Dictionary<string, object> jsonBody = body.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -160,15 +166,7 @@ public class NotificationsScript : MonoBehaviour
         }
     }
 
-    private void ApproveRequest()
-    {
-        ApproveOrDeclien(1);
-    }
-
-    private void DeclineRequest()
-    {
-        ApproveOrDeclien(2);
-    }
+  
 
     private void seenRequest(int index)
     {

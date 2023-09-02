@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 8392046770874234398}
   - component: {fileID: 5016642608504106832}
   m_Layer: 5
-  m_Name: Button
-  m_TagString: Untagged
+  m_Name: accept
+  m_TagString: accept
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -283,8 +283,8 @@ GameObject:
   - component: {fileID: 6725790776693932711}
   - component: {fileID: 2313305709731307958}
   m_Layer: 5
-  m_Name: Button (1)
-  m_TagString: Untagged
+  m_Name: decline
+  m_TagString: decline
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
