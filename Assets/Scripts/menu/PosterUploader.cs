@@ -293,8 +293,11 @@ public class PosterUploader : MonoBehaviour
             List<PosterDTO> postersDto = roomDataDto.room.posters;
             foreach (var posterDto in postersDto)
             {
-                // Load the image from the URL and set it as the sprite for the SpriteRenderer
-                StartCoroutine(LoadImageFromURL(posterDto.fileUrl,new Vector3(posterDto.position.x, posterDto.position.y, 0), posterDto));
+                if (!posterIdToGameObject.ContainsKey(posterDto.posterId))
+                {
+                    // Load the image from the URL and set it as the sprite for the SpriteRenderer
+                    StartCoroutine(LoadImageFromURL(posterDto.fileUrl,new Vector3(posterDto.position.x, posterDto.position.y, 0), posterDto));
+                }
             } 
         }
         else
