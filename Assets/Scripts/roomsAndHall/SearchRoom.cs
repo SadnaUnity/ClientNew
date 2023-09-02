@@ -11,7 +11,7 @@ public class SearchRoom : MonoBehaviour
     private Player playerData;
     
     [SerializeField] private TMP_InputField roomInputField;
-    [SerializeField] private TMP_Text errorMsg;
+    [SerializeField] private GameObject RoomNotExistPanel;
     [SerializeField] private GameObject hallController;
 
     void Start()
@@ -48,7 +48,7 @@ public class SearchRoom : MonoBehaviour
         }
         else
         {
-            errorMsg.text = "Room Does Not Exists!";
+            RoomNotExistPanel.SetActive(true);
         }
     }
 
@@ -61,6 +61,11 @@ public class SearchRoom : MonoBehaviour
         }
 
         return -1;
+    }
+
+    public void ClosePopUp()
+    {
+        RoomNotExistPanel.SetActive(false);
     }
     
 }
