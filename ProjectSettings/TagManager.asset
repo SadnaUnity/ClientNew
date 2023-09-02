@@ -6,6 +6,8 @@ TagManager:
   tags:
   - moving
   - door1
+  - accept
+  - decline
   layers:
   - Default
   - TransparentFX
