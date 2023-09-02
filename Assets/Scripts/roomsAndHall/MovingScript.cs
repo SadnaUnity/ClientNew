@@ -162,6 +162,7 @@ public class MovingScript : MonoBehaviour
 
     private void RemoveLogoutPlayerFromScreen()
     {
+        List<int> idsToRemove = new List<int>();
         foreach (int key in playersOnScreen.Keys)
         {
             if (!playersOnScreen[key])
@@ -169,8 +170,15 @@ public class MovingScript : MonoBehaviour
                 GameObject playerToDelete = playersById[key];
                 Destroy(playerToDelete);
                 playersById.Remove(key);
+                idsToRemove.Add(key);
             }
         }
+
+        foreach (var id in idsToRemove)
+        {
+            playersOnScreen.Remove(id);
+        }
+        
     }
 
     private void InitPlayerOnScreen()
