@@ -60,15 +60,14 @@ public class MovingScript : MonoBehaviour
 
         SendPosition(curPlayer.transform.position);
         // Start coroutine to get other players' positions every second
-        StartCoroutine(GetOtherPlayersPositions());
-       
+
     }
 
     // Update is called once per frame
     void Update()
     {
        MovePlayer();
-        
+       GetOtherPlayersPositions();
        // Debug.Log(curPlayer.transform.position);
 
     }
@@ -111,62 +110,59 @@ public class MovingScript : MonoBehaviour
         };
         var res = httpReq.SendDataToServer(queryParams, jsonPos, rsc, "POST");
     }
-    IEnumerator GetOtherPlayersPositions()
+    private void GetOtherPlayersPositions()
     {
-        while (true)
+        List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
         {
-            List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
-            {
-                new("userId", playerId)
-            };
-            var res = httpReq.SendDataToServer(queryParams, "", "/getPositions", "GET");
-            if (res.Item1 == 200)
-            {
-                // Parse the JSON response into a list of players
-                PosDataDTO playersPositions = JsonConvert.DeserializeObject<PosDataDTO>(res.Item2);
-                List<Tuple<Avatar, Position>> avatarPositions = GetAllAvatarsPositions(playersPositions);
+            new("userId", playerId)
+        };
+        var res = httpReq.SendDataToServer(queryParams, "", "/getPositions", "GET");
+        if (res.Item1 == 200)
+        {
+            // Parse the JSON response into a list of players
+            PosDataDTO playersPositions = JsonConvert.DeserializeObject<PosDataDTO>(res.Item2);
+            List<Tuple<Avatar, Position>> avatarPositions = GetAllAvatarsPositions(playersPositions);
 
-                InitPlayerOnScreen();
-                
-                // Update the positions of all other players in the game scene
-                foreach (Tuple<Avatar, Position> avatarPosition in avatarPositions)
+            InitPlayerOnScreen();
+            
+            // Update the positions of all other players in the game scene
+            foreach (Tuple<Avatar, Position> avatarPosition in avatarPositions)
+            {
+                int id = avatarPosition.Item1.GetId();
+                playersOnScreen[id] = true;
+                if (id != playerId)
                 {
-                    int id = avatarPosition.Item1.GetId();
-                    playersOnScreen[id] = true;
-                    if (id != playerId)
+                    //If not on screen yet
+                    if (!playersById.ContainsKey(id))
                     {
-                        //If not on screen yet
-                        if (!playersById.ContainsKey(id))
+                        playersById.Add(id, CreateGameObject(avatarPosition));
+                    }
+                    
+                    //Already on screen - move him slowly towards target
+                    else
+                    {
+                        Vector3 targetPosition = new Vector3(avatarPosition.Item2.GetX(), avatarPosition.Item2.GetY(),0f);
+                        while (playersById[id].transform.position != targetPosition)
                         {
-                            playersById.Add(id, CreateGameObject(avatarPosition));
-                        }
-                        
-                        //Already on screen - move him slowly towards target
-                        else
-                        {
-                            Vector3 targetPosition = new Vector3(avatarPosition.Item2.GetX(), avatarPosition.Item2.GetY(),0f);
-                            while (playersById[id].transform.position != targetPosition)
-                            {
-                                playersById[id].transform.position = Vector3.MoveTowards(playersById[id].transform.position, targetPosition, speed * Time.deltaTime);
-                                yield return null;
-                            }
+                            playersById[id].transform.position = Vector3.MoveTowards(playersById[id].transform.position, targetPosition, speed * Time.deltaTime);
+                            
                         }
                     }
                 }
+            }
 
-                RemoveLogoutPlayerFromScreen();
-            }
-            else
-            {
-                Debug.Log("GET request failed: " + res.Item2);
-            }
-            
-            yield return new WaitForSeconds(0.4f);
+            RemoveLogoutPlayerFromScreen();
         }
+        else
+        {
+            Debug.Log("GetPositions FAIL!: " + res.Item2);
+        }
+
     }
 
     private void RemoveLogoutPlayerFromScreen()
     {
+        List<int> idsToRemove = new List<int>();
         foreach (int key in playersOnScreen.Keys)
         {
             if (!playersOnScreen[key])
@@ -174,8 +170,15 @@ public class MovingScript : MonoBehaviour
                 GameObject playerToDelete = playersById[key];
                 Destroy(playerToDelete);
                 playersById.Remove(key);
+                idsToRemove.Add(key);
             }
         }
+
+        foreach (var id in idsToRemove)
+        {
+            playersOnScreen.Remove(id);
+        }
+        
     }
 
     private void InitPlayerOnScreen()
@@ -206,7 +209,8 @@ public class MovingScript : MonoBehaviour
 
         // Add a SpriteRenderer component to the new GameObject
         SpriteRenderer spriteRenderer = character.AddComponent<SpriteRenderer>();
-        
+
+        spriteRenderer.sortingOrder = 1;
         // Assign the sprite to the SpriteRenderer component and load img
         spriteRenderer.sprite = Resources.Load<Sprite>(GetAvatarPath(avatarPosition.Item1));
 

@@ -28,6 +28,11 @@ public class RoomStatus
         return roomName;
     }
 
+    public  bool getPrivecy()
+    {
+        return privacy;
+    }
+
     public RoomMemberStatus GetRoomMemberStatus()
     {
         return roomMemberStatus;

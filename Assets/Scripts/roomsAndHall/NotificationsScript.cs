@@ -5,6 +5,7 @@ using Classes;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
@@ -193,6 +194,8 @@ public class NotificationsScript : MonoBehaviour
         {
             Debug.LogError("Error while trying to approve completed request.");
         }
+
+        SceneManager.LoadScene("Moving");
     }
 
     private IEnumerator CallNotificationsFunctionRepeatedly()
