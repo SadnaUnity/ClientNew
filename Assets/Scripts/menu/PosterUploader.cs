@@ -140,8 +140,9 @@ public class PosterUploader : MonoBehaviour
         {
             PosterDataDTO posterDataDto = JsonConvert.DeserializeObject<PosterDataDTO>(res.Item2);
             tmpPoster.name = posterDataDto.poster.posterName;
-            posterIdToGameObject.Add(posterDataDto.posterId, tmpPoster);
-            posterIdToPosterName.Add(posterDataDto.posterId, posterDataDto.poster.posterName);
+            Destroy(tmpPoster);
+            //posterIdToGameObject.Add(posterDataDto.posterId, tmpPoster);
+            //posterIdToPosterName.Add(posterDataDto.posterId, posterDataDto.poster.posterName);
             posterNameIf.text = "";
             ChangeInteractable(1);
         }
