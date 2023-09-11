@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using TMPro;
 using Unity.VisualScripting;
@@ -191,8 +192,6 @@ public class PosterUploader : MonoBehaviour
             toggleRect.sizeDelta = new Vector2(toggleRect.sizeDelta.x, buttonHeight);
         }
     }
-
-
     private void OnToggleValueChanged(bool isOn)
     {
         Toggle clickedToggle = EventSystem.current.currentSelectedGameObject.GetComponent<Toggle>();
@@ -208,7 +207,6 @@ public class PosterUploader : MonoBehaviour
             }
         }
     }
-    
     public void DeletePoster()
     {
         int selectedPosterId = -1;
@@ -242,7 +240,6 @@ public class PosterUploader : MonoBehaviour
         DeletePosterFromRoom(selectedPosterId);
         DestroyAllToggles();
     }
-
     private void DestroyAllToggles()
     {
         foreach (Toggle toggle in toggleToPosterId.Keys)
@@ -251,8 +248,6 @@ public class PosterUploader : MonoBehaviour
         }
         toggleToPosterId.Clear();
     }
-
-
     private void DeletePosterFromRoom(int selectedPosterId)
     {
         GameObject posterGoToDelete = posterIdToGameObject[selectedPosterId];
@@ -268,7 +263,6 @@ public class PosterUploader : MonoBehaviour
             posterIdToPosterName.Remove(selectedPosterId);
         }
     }
-    
     private IEnumerator StartGetRoomPostersCoroutine()
     {
         while (true)
@@ -277,7 +271,6 @@ public class PosterUploader : MonoBehaviour
             yield return new WaitForSeconds(3f); // Wait for 3 seconds before running it again
         }
     }
-    
     private void GetRoomPosters()
     {
         List<KeyValuePair<string, object>> queryParams = new List<KeyValuePair<string, object>>
@@ -298,13 +291,41 @@ public class PosterUploader : MonoBehaviour
                     // Load the image from the URL and set it as the sprite for the SpriteRenderer
                     StartCoroutine(LoadImageFromURL(posterDto.fileUrl,new Vector3(posterDto.position.x, posterDto.position.y, 0), posterDto));
                 }
-            } 
+            }
+
+            RemoveDeletedPosters(postersDto);
         }
         else
         {
             Debug.Log("Error get room posters " + playerData.GetRoomId());
         }
     }
+
+    private void RemoveDeletedPosters(List<PosterDTO> postersDto)
+    {
+        List<int> postersIdsThatExist = new List<int>();
+        List<int> idsToRemove = new List<int>();
+        
+        foreach (var posterDto in postersDto)
+        {
+            postersIdsThatExist.Add(posterDto.posterId);
+        }
+        
+        foreach (var posterId in posterIdToGameObject.Keys.ToList())
+        {
+            if (!postersIdsThatExist.Contains(posterId))
+            {
+                idsToRemove.Add(posterId);
+            }
+        }
+
+        foreach (int idToRemove in idsToRemove)
+        {
+            DeletePosterFromRoom(idToRemove);
+        }
+        
+    }
+
     IEnumerator LoadImageFromURL(string url, Vector3 position, PosterDTO posterDto)
     {
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
